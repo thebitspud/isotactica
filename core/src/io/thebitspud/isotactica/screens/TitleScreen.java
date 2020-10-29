@@ -1,6 +1,5 @@
 package io.thebitspud.isotactica.screens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 
 public class TitleScreen implements Screen {

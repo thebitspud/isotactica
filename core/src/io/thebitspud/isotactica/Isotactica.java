@@ -6,8 +6,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.thebitspud.isotactica.screens.GameScreen;
 import io.thebitspud.isotactica.screens.PauseScreen;
 import io.thebitspud.isotactica.screens.TitleScreen;
+import io.thebitspud.isotactica.utils.AssetHandler;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 
 /**
  * The Game class from which all other classes emerge
@@ -15,28 +16,29 @@ import java.util.HashMap;
  */
 
 public class Isotactica extends Game {
+	private AssetHandler assets;
 	private SpriteBatch batch;
 
-	public enum ScreenID {
-		TITLE,
-		GAME,
-		PAUSE
+	/** An enum of all accessible game screens */
+	public enum ScreenKey {
+		TITLE, GAME, PAUSE
 	}
 
-	private HashMap<ScreenID, Screen> screens;
+	private EnumMap<ScreenKey, Screen> screens;
 	
 	@Override
 	public void create () {
+		assets = new AssetHandler();
 		batch = new SpriteBatch();
 
-		// finish asset loading here
+		assets.loadAll();
 
-		screens = new HashMap<>();
-		screens.put(ScreenID.TITLE, new TitleScreen());
-		screens.put(ScreenID.GAME, new GameScreen());
-		screens.put(ScreenID.PAUSE, new PauseScreen());
+		screens = new EnumMap<>(ScreenKey.class);
+		screens.put(ScreenKey.TITLE, new TitleScreen());
+		screens.put(ScreenKey.GAME, new GameScreen());
+		screens.put(ScreenKey.PAUSE, new PauseScreen());
 
-		setScreen(getScreen(ScreenID.TITLE));
+		setScreen(getScreen(ScreenKey.TITLE));
 	}
 
 	@Override
@@ -46,20 +48,27 @@ public class Isotactica extends Game {
 	
 	@Override
 	public void dispose() {
+		assets.dispose();
 		batch.dispose();
 	}
 
 	/* Getters and Setters */
 
-	public Screen getScreen(ScreenID id) {
-		return screens.get(id);
-	}
-
-	public void setScreen(ScreenID id) {
-		setScreen(screens.get(id));
+	public AssetHandler getAssets() {
+		return assets;
 	}
 
 	public SpriteBatch getBatch() {
 		return batch;
+	}
+
+	/** Retrieves the screen which the specified key is mapped to */
+	public Screen getScreen(ScreenKey key) {
+		return screens.get(key);
+	}
+
+	/** Sets the active screen to the one which the specified key is mapped to */
+	public void setScreen(ScreenKey key) {
+		setScreen(screens.get(key));
 	}
 }
