@@ -9,6 +9,13 @@ public abstract class JTimerUtil implements Activatable {
 	private double timeElapsed, timerDuration;
 	private boolean autoRepeat, active;
 
+	/**
+	 * Instantiates a JTimerUtil based on the specified parameters
+	 * @param duration how long (in seconds) it takes for the timer to activate
+	 * @param autoRepeat whether the timer automatically repeats when complete
+	 * @param active whether the timer automatically begins counting
+	 */
+
 	protected JTimerUtil(double duration, boolean autoRepeat, boolean active) {
 		this.timerDuration = duration;
 		this.autoRepeat = autoRepeat;
@@ -28,6 +35,11 @@ public abstract class JTimerUtil implements Activatable {
 		this.active = active;
 	}
 
+	/**
+	 * Updates the JTimerUtil's internal stopwatch
+	 * @param delta the time (in seconds) since the last update
+	 */
+
 	public void tick(float delta) {
 		if(!active) return;
 
@@ -43,6 +55,16 @@ public abstract class JTimerUtil implements Activatable {
 		}
 	}
 
+	/* Getters and Setters */
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public boolean isAutoRepeating() {
+		return autoRepeat;
+	}
+
 	public double getTimeElapsed() {
 		return timeElapsed;
 	}
@@ -51,27 +73,19 @@ public abstract class JTimerUtil implements Activatable {
 		return timerDuration;
 	}
 
-	public boolean isAutoRepeating() {
-		return autoRepeat;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setTimeElapsed(double time) {
-		this.timeElapsed = time;
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 	public void setAutoRepeat(boolean repeat) {
 		this.autoRepeat = repeat;
 	}
 
-	public void setTimerDuration(double duration) {
-		this.timerDuration = duration;
+	public void setTimeElapsed(double time) {
+		this.timeElapsed = time;
 	}
 
-	public void setActive(boolean active) {
-		this.active = active;
+	public void setTimerDuration(double duration) {
+		this.timerDuration = duration;
 	}
 }

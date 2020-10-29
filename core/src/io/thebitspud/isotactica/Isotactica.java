@@ -27,8 +27,8 @@ public class Isotactica extends Game {
 	private EnumMap<ScreenKey, Screen> screens;
 	
 	@Override
-	public void create () {
-		assets = new AssetHandler();
+	public void create() {
+		assets = new AssetHandler(this);
 		batch = new SpriteBatch();
 
 		assets.loadAll();
@@ -42,7 +42,7 @@ public class Isotactica extends Game {
 	}
 
 	@Override
-	public void render () {
+	public void render() {
 		super.render();
 	}
 	
