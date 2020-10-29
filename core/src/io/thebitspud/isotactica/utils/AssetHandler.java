@@ -33,6 +33,8 @@ public class AssetHandler extends AssetManager {
 		montserrat = new Label.LabelStyle[4];
 	}
 
+	/* Loader Functions */
+
 	public void loadAll() {
 		loadFiles();
 		generateFonts();
@@ -81,6 +83,12 @@ public class AssetHandler extends AssetManager {
 		buttons[15] = getButton(buttonSheet, 0, 710, 90, 90);
 	}
 
+	private void assignAudio() {
+
+	}
+
+	/* Asset Retrieval Functions */
+
 	private TextureRegionDrawable[] getButton(Texture sheet, int x, int y, int width, int height) {
 		final TextureRegion iconUp = new TextureRegion(sheet, x, y, width, height);
 		final TextureRegion iconHover = new TextureRegion(sheet, x + width, y, width, height);
@@ -103,9 +111,5 @@ public class AssetHandler extends AssetManager {
 		style.imageDown = button[2];
 
 		return style;
-	}
-
-	private void assignAudio() {
-
 	}
 }

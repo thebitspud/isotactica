@@ -25,6 +25,8 @@ public class Isotactica extends Game {
 	}
 
 	private EnumMap<ScreenKey, Screen> screens;
+
+	/* Inherited Functions */
 	
 	@Override
 	public void create() {
@@ -34,9 +36,9 @@ public class Isotactica extends Game {
 		assets.loadAll();
 
 		screens = new EnumMap<>(ScreenKey.class);
-		screens.put(ScreenKey.TITLE, new TitleScreen());
-		screens.put(ScreenKey.GAME, new GameScreen());
-		screens.put(ScreenKey.PAUSE, new PauseScreen());
+		screens.put(ScreenKey.TITLE, new TitleScreen(this));
+		screens.put(ScreenKey.GAME, new GameScreen(this));
+		screens.put(ScreenKey.PAUSE, new PauseScreen(this));
 
 		setScreen(getScreen(ScreenKey.TITLE));
 	}
