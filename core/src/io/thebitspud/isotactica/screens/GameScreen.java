@@ -2,14 +2,22 @@ package io.thebitspud.isotactica.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Align;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.utils.JInputListener;
+import io.thebitspud.isotactica.world.World;
 
 public class GameScreen extends JScreenTemplate {
+	private InputMultiplexer multiplexer;
+	private World world;
+
 	public GameScreen(Isotactica game) {
 		super(game);
+
+		multiplexer = new InputMultiplexer(stage);
+		world = game.getWorld();
 	}
 
 	/* Inherited Functions */
@@ -37,7 +45,15 @@ public class GameScreen extends JScreenTemplate {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		world.tick(delta);
+		world.render();
+
 		stage.act();
 		stage.draw();
+	}
+
+	@Override
+	public void show() {
+		Gdx.input.setInputProcessor(multiplexer);
 	}
 }

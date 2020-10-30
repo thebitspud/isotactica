@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.thebitspud.isotactica.screens.*;
 import io.thebitspud.isotactica.utils.AssetHandler;
+import io.thebitspud.isotactica.world.World;
 
 import java.util.EnumMap;
 
@@ -13,8 +14,16 @@ import java.util.EnumMap;
  */
 
 public class Isotactica extends Game {
+	/* Constants */
+
+	public final int TILE_WIDTH = 64;
+	public final int TILE_HEIGHT = 32;
+
+	/* Data */
+
 	private AssetHandler assets;
 	private SpriteBatch batch;
+	private World world;
 
 	/** An enum of all accessible game screens */
 	public enum ScreenKey {
@@ -29,6 +38,7 @@ public class Isotactica extends Game {
 	public void create() {
 		assets = new AssetHandler(this);
 		batch = new SpriteBatch();
+		world = new World(this);
 
 		assets.loadAll();
 
@@ -37,6 +47,7 @@ public class Isotactica extends Game {
 		screens.put(ScreenKey.GAME, new GameScreen(this));
 		screens.put(ScreenKey.PAUSE, new PauseScreen(this));
 
+		world.load("isotest");
 		setScreen(getScreen(ScreenKey.TITLE));
 	}
 
@@ -49,6 +60,7 @@ public class Isotactica extends Game {
 	public void dispose() {
 		assets.dispose();
 		batch.dispose();
+		world.dispose();
 	}
 
 	/* Getters and Setters */
@@ -64,6 +76,10 @@ public class Isotactica extends Game {
 	/** Retrieves the screen which the specified key is mapped to */
 	public JScreenTemplate getScreen(ScreenKey key) {
 		return screens.get(key);
+	}
+
+	public World getWorld() {
+		return world;
 	}
 
 	/** Sets the active screen to the one which the specified key is mapped to */

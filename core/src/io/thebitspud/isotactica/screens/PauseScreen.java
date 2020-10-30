@@ -28,7 +28,7 @@ public class PauseScreen extends JScreenTemplate {
 			@Override
 			public void onActivation() {
 				game.setScreen(game.getScreen(Isotactica.ScreenKey.GAME));
-				// game.world.init("testlevel.tmx");
+				game.getWorld().load("isotest");
 			}
 		});
 		addImageButton(5, Align.center, width * 0.5f, height * 0.2f, new JInputListener() {
