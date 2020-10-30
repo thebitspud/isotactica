@@ -13,6 +13,7 @@ public class World {
 	private Isotactica game;
 	private TiledMap map;
 	private TiledMapRenderer mapRenderer;
+	private IsometricMapOverlay mapOverlay;
 	private OrthographicCamera mapCamera;
 
 	private WorldInputHandler input;
@@ -23,6 +24,7 @@ public class World {
 		this.game = game;
 
 		mapCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		mapOverlay = new IsometricMapOverlay(game, mapCamera);
 		input = new WorldInputHandler(this);
 	}
 
@@ -62,8 +64,7 @@ public class World {
 	public void render() {
 		mapRenderer.setView(mapCamera);
 		mapRenderer.render();
-
-		input.render();
+		mapOverlay.render();
 	}
 
 	public void dispose() {

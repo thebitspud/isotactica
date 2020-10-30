@@ -22,6 +22,7 @@ public class AssetHandler extends AssetManager {
 	private Isotactica game;
 	private ShapeDrawer drawer;
 	private TextureRegion pixel;
+	public TextureRegion[] highlights;
 	public TextureRegionDrawable[][] buttons;
 
 	public Label.LabelStyle[] montserrat;
@@ -31,6 +32,7 @@ public class AssetHandler extends AssetManager {
 
 		buttons = new TextureRegionDrawable[16][3];
 		montserrat = new Label.LabelStyle[4];
+		highlights = new TextureRegion[2];
 	}
 
 	/* Loader Functions */
@@ -49,6 +51,7 @@ public class AssetHandler extends AssetManager {
 	private void loadFiles() {
 		load("buttons.png", Texture.class);
 		load("common_iso.png", Texture.class);
+		load("highlights.png", Texture.class);
 		load("pixel.png", Texture.class);
 
 		setLoader(TiledMap.class, new TmxMapLoader());
@@ -74,6 +77,7 @@ public class AssetHandler extends AssetManager {
 
 	private void assignTextures() {
 		final Texture buttonSheet = this.get("buttons.png", Texture.class);
+		final Texture highlightSheet = this.get("highlights.png", Texture.class);
 		pixel = new TextureRegion(this.get("pixel.png", Texture.class));
 
 		for (int i = 0; i < 15; i++) {
@@ -81,6 +85,10 @@ public class AssetHandler extends AssetManager {
 			else buttons[i] = getButton(buttonSheet, 1200, (i - 6) * 90, 90, 90);
 		}
 		buttons[15] = getButton(buttonSheet, 0, 710, 90, 90);
+
+		for (int i = 0; i < highlights.length; i++) {
+			highlights[i] = new TextureRegion(highlightSheet, i * 64, 0, 64, 32);
+		}
 	}
 
 	private void assignAudio() {

@@ -5,6 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+/**
+ * A utility class that handles input events for the world map
+ */
+
 public class WorldInputHandler implements InputProcessor {
 	private World world;
 	private OrthographicCamera mapCamera;
@@ -32,10 +36,6 @@ public class WorldInputHandler implements InputProcessor {
 
 		mapCamera.position.x += xVel * delta * mapCamera.zoom;
 		mapCamera.position.y += yVel * delta * mapCamera.zoom;
-	}
-
-	public void render() {
-
 	}
 
 	@Override
