@@ -11,12 +11,12 @@ import io.thebitspud.isotactica.Isotactica;
 
 public class World {
 	private Isotactica game;
+	private IsometricMapOverlay mapOverlay;
+	private WorldInputHandler input;
+
 	private TiledMap map;
 	private TiledMapRenderer mapRenderer;
-	private IsometricMapOverlay mapOverlay;
 	private OrthographicCamera mapCamera;
-
-	private WorldInputHandler input;
 
 	private int width, height;
 
@@ -24,7 +24,7 @@ public class World {
 		this.game = game;
 
 		mapCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		mapOverlay = new IsometricMapOverlay(game, mapCamera);
+		mapOverlay = new IsometricMapOverlay(game, this);
 		input = new WorldInputHandler(this);
 	}
 
@@ -46,7 +46,7 @@ public class World {
 	}
 
 	/**
-	 * Keeps camera properties within acceptable bounds
+	 * Keeps the camera's view properties within acceptable bounds
 	 */
 
 	private void clampMapBounds() {
@@ -77,5 +77,13 @@ public class World {
 
 	public OrthographicCamera getMapCamera() {
 		return mapCamera;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 }
