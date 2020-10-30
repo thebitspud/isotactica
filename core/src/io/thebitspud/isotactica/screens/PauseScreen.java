@@ -3,8 +3,7 @@ package io.thebitspud.isotactica.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.utils.JInputListener;
 
@@ -13,42 +12,31 @@ public class PauseScreen extends JScreenTemplate {
 		super(game);
 	}
 
+	/* Inherited Functions */
+
 	@Override
 	protected void initStageComponents(int width, int height) {
-		Label title = new Label("Game Paused", assets.montserrat[0]);
-		title.setPosition((width - title.getPrefWidth()) * 0.5f, height * 0.75f);
-		stage.addActor(title);
+		addTitleLabel("Game Paused", width, height);
 
-		ImageButton resumeButton = new ImageButton(assets.getButtonStyle(assets.buttons[3]));
-		resumeButton.addListener(new JInputListener() {
+		addImageButton(3, Align.center, width * 0.5f, height * 0.6f, new JInputListener() {
 			@Override
 			public void onActivation() {
 				game.setScreen(game.getScreen(Isotactica.ScreenKey.GAME));
 			}
 		});
-		resumeButton.setPosition(width * 0.5f - 200, height * 0.55f);
-		stage.addActor(resumeButton);
-
-		ImageButton restartButton = new ImageButton(assets.getButtonStyle(assets.buttons[4]));
-		restartButton.addListener(new JInputListener() {
+		addImageButton(4, Align.center, width * 0.5f, height * 0.4f, new JInputListener() {
 			@Override
 			public void onActivation() {
 				game.setScreen(game.getScreen(Isotactica.ScreenKey.GAME));
 				// game.world.init("testlevel.tmx");
 			}
 		});
-		restartButton.setPosition(width * 0.5f - 200, height * 0.35f);
-		stage.addActor(restartButton);
-
-		ImageButton quitButton = new ImageButton(assets.getButtonStyle(assets.buttons[5]));
-		quitButton.addListener(new JInputListener() {
+		addImageButton(5, Align.center, width * 0.5f, height * 0.2f, new JInputListener() {
 			@Override
 			public void onActivation() {
 				game.setScreen(game.getScreen(Isotactica.ScreenKey.TITLE));
 			}
 		});
-		quitButton.setPosition(width * 0.5f - 200, height * 0.15f);
-		stage.addActor(quitButton);
 	}
 
 	@Override

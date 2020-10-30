@@ -1,11 +1,8 @@
 package io.thebitspud.isotactica;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import io.thebitspud.isotactica.screens.GameScreen;
-import io.thebitspud.isotactica.screens.PauseScreen;
-import io.thebitspud.isotactica.screens.TitleScreen;
+import io.thebitspud.isotactica.screens.*;
 import io.thebitspud.isotactica.utils.AssetHandler;
 
 import java.util.EnumMap;
@@ -24,7 +21,7 @@ public class Isotactica extends Game {
 		TITLE, GAME, PAUSE
 	}
 
-	private EnumMap<ScreenKey, Screen> screens;
+	private EnumMap<ScreenKey, JScreenTemplate> screens;
 
 	/* Inherited Functions */
 	
@@ -65,7 +62,7 @@ public class Isotactica extends Game {
 	}
 
 	/** Retrieves the screen which the specified key is mapped to */
-	public Screen getScreen(ScreenKey key) {
+	public JScreenTemplate getScreen(ScreenKey key) {
 		return screens.get(key);
 	}
 

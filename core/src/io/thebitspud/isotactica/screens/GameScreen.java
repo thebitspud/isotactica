@@ -3,7 +3,7 @@ package io.thebitspud.isotactica.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.utils.Align;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.utils.JInputListener;
 
@@ -12,27 +12,22 @@ public class GameScreen extends JScreenTemplate {
 		super(game);
 	}
 
+	/* Inherited Functions */
+
 	@Override
 	protected void initStageComponents(int width, int height) {
-		ImageButton pauseButton = new ImageButton(assets.getButtonStyle(assets.buttons[14]));
-		pauseButton.addListener(new JInputListener() {
+		addImageButton(14, Align.topRight, width - 25, height - 25, new JInputListener() {
 			@Override
 			public void onActivation() {
 				game.setScreen(Isotactica.ScreenKey.PAUSE);
 			}
 		});
-		pauseButton.setPosition(width - 115, height - 115);
-		stage.addActor(pauseButton);
-
-		ImageButton endTurnButton = new ImageButton(assets.getButtonStyle(assets.buttons[11]));
-		endTurnButton.addListener(new JInputListener() {
+		addImageButton(11, Align.bottomRight, width - 25, 25, new JInputListener() {
 			@Override
 			public void onActivation() {
 				// world.nextPlayer();
 			}
 		});
-		endTurnButton.setPosition(width - 115, 25);
-		stage.addActor(endTurnButton);
 	}
 
 	@Override
