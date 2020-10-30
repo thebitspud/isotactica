@@ -16,8 +16,8 @@ public class GameScreen extends JScreenTemplate {
 	public GameScreen(Isotactica game) {
 		super(game);
 
-		multiplexer = new InputMultiplexer(stage);
 		world = game.getWorld();
+		multiplexer = new InputMultiplexer(stage, world.getInput());
 	}
 
 	/* Inherited Functions */
