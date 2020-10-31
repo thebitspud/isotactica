@@ -2,9 +2,6 @@ package io.thebitspud.isotactica.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -13,6 +10,11 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import io.thebitspud.isotactica.Isotactica;
+
+/**
+ * The game world in which combat encounters are processed and resolved.
+ * Consists of a Tiled map, player-controlled camera, and map overlay.
+ */
 
 public class World {
 	private Isotactica game;
@@ -40,7 +42,7 @@ public class World {
 		height = map.getProperties().get("height", Integer.class);
 
 		mapCamera.zoom = 0.5f;
-		mapCamera.position.x = 0;
+		mapCamera.position.x = width * game.TILE_WIDTH / 2f;
 		mapCamera.position.y = 0;
 	}
 

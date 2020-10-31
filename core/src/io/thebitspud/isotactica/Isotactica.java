@@ -9,23 +9,19 @@ import io.thebitspud.isotactica.world.World;
 import java.util.EnumMap;
 
 /**
- * The Game class from which all other classes emerge
+ * The Game class from which all other classes are initialized
  * Global variables and common functions go here
  */
 
 public class Isotactica extends Game {
-	/* Constants */
-
 	public final int TILE_WIDTH = 64;
 	public final int TILE_HEIGHT = 32;
-
-	/* Data */
 
 	private AssetHandler assets;
 	private SpriteBatch batch;
 	private World world;
 
-	/** An enum of all accessible game screens */
+	/** An enum of all accessible screens */
 	public enum ScreenKey {
 		TITLE, GAME, PAUSE
 	}

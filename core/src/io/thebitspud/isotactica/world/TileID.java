@@ -2,6 +2,10 @@ package io.thebitspud.isotactica.world;
 
 import java.util.Arrays;
 
+/**
+ * An enum of all possible tile types and their respective properties
+ */
+
 public enum TileID {
 	VOID (MovementProfile.NONE),
 	GRASS (MovementProfile.FAST),
@@ -12,11 +16,20 @@ public enum TileID {
 	LAVA (MovementProfile.NONE),
 	WATER (MovementProfile.SLOW);
 
+	/** An enum of possible states for movement on a tile */
+	enum MovementProfile {
+		FAST, // normal movement
+		SLOW, // reduced movement
+		NONE, // no movement
+	}
+
 	private final MovementProfile profile;
 
 	TileID(MovementProfile profile) {
 		this.profile = profile;
 	}
+
+	/* Data Retrieval */
 
 	public MovementProfile getProfile() {
 		return profile;
@@ -33,11 +46,5 @@ public enum TileID {
 		String propertiesText = "\nMovement: " + this.profile;
 
 		return idText + propertiesText;
-	}
-
-	enum MovementProfile {
-		FAST, // full movement
-		SLOW, // reduced movement
-		NONE, // no movement
 	}
 }

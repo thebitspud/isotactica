@@ -8,6 +8,11 @@ import io.thebitspud.isotactica.screens.GameScreen;
 
 import java.awt.*;
 
+/**
+ * The in-game Tiled map overlay that enables tile selection and highlighting.
+ * Also contains functions for retrieving tile coordinates and render position.
+ */
+
 public class IsometricMapOverlay {
 	private Isotactica game;
 	private World world;
@@ -29,7 +34,6 @@ public class IsometricMapOverlay {
 	 * Highlights the tile the player's mouse is currently hovering over.
 	 * This function is currently incomplete
 	 */
-
 	private void highlightTiles() {
 		GameScreen gScreen = ((GameScreen) game.getScreen(Isotactica.ScreenKey.GAME));
 		Point coord = getCoordinateFromPointer(Gdx.input.getX(), Gdx.input.getY());
@@ -38,10 +42,9 @@ public class IsometricMapOverlay {
 			return;
 		}
 
+		// displaying the info of the tile being hovered over
 		String coordText = "[" + coord.x + "," + coord.y + "]";
 		String tileText = world.getTileID(coord.x, coord.y).getTileInfo();
-
-		// displaying the info of the tile being hovered over
 		gScreen.setTileInfoText(coordText + tileText);
 
 		// drawing the highlight texture

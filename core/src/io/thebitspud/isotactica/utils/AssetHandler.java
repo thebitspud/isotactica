@@ -21,10 +21,10 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 public class AssetHandler extends AssetManager {
 	private Isotactica game;
 	private ShapeDrawer drawer;
+
 	private TextureRegion pixel;
 	public TextureRegion[] highlights;
 	public TextureRegionDrawable[][] buttons;
-
 	public Label.LabelStyle[] montserrat;
 
 	public AssetHandler(Isotactica game) {
@@ -32,11 +32,12 @@ public class AssetHandler extends AssetManager {
 
 		buttons = new TextureRegionDrawable[16][3];
 		montserrat = new Label.LabelStyle[4];
-		highlights = new TextureRegion[2];
+		highlights = new TextureRegion[8];
 	}
 
 	/* Loader Functions */
 
+	/** Loads and assigns all game assets in the specified order */
 	public void loadAll() {
 		loadFiles();
 		generateFonts();
@@ -76,10 +77,12 @@ public class AssetHandler extends AssetManager {
 	}
 
 	private void assignTextures() {
+		// Retrieving sheets
 		final Texture buttonSheet = this.get("buttons.png", Texture.class);
 		final Texture highlightSheet = this.get("highlights.png", Texture.class);
 		pixel = new TextureRegion(this.get("pixel.png", Texture.class));
 
+		// Assigning textures
 		for (int i = 0; i < 15; i++) {
 			if (i < 6) buttons[i] = getButton(buttonSheet, 0, i * 90, 400, 90);
 			else buttons[i] = getButton(buttonSheet, 1200, (i - 6) * 90, 90, 90);

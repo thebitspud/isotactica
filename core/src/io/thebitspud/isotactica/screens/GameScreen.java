@@ -62,6 +62,8 @@ public class GameScreen extends JScreenTemplate {
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 
+	/* Getters and Setters */
+
 	public void setTileInfoText(String text) {
 		tileInfo.setText(text);
 	}
