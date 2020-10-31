@@ -41,10 +41,11 @@ public abstract class JScreenTemplate implements Screen {
 
 	/* Actor Creation Utilities */
 
-	/** Generates a label according to the specified parameters and adds it to the stage */
-	protected Label addLabel(String text, int size, int alignment, float x, float y) {
-		Label label = new Label(text, assets.montserrat[size]);
-		label.setPosition(x, y, alignment);
+	/** Generates an empty label according to the specified parameters and adds it to the stage */
+	protected Label addLabel(int size, int alignment, float x, float y) {
+		Label label = new Label("", assets.montserrat[size]);
+		label.setPosition(x, y);
+		label.setAlignment(alignment);
 		stage.addActor(label);
 
 		return label;
@@ -52,7 +53,9 @@ public abstract class JScreenTemplate implements Screen {
 
 	/** Generates a title label according to the specified parameters and adds it to the stage */
 	protected void addTitleLabel(String text, int width, int height) {
-		addLabel(text, 0, Align.center, width / 2f, height * 0.8f);
+		Label title = new Label(text, assets.montserrat[0]);
+		title.setPosition(width / 2f, height * 0.8f, Align.center);
+		stage.addActor(title);
 	}
 
 	/** Generates an ImageButton according to the specified parameters and adds it to the stage */

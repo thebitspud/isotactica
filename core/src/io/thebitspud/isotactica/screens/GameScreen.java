@@ -26,8 +26,8 @@ public class GameScreen extends JScreenTemplate {
 
 	@Override
 	protected void initStageComponents(int width, int height) {
-		turnInfo = addLabel(" ", 2, Align.bottomLeft, 25, 25);
-		tileInfo = addLabel(" ", 2, Align.topLeft, 25, height - 25);
+		turnInfo = addLabel(2, Align.bottomLeft, 25, 25);
+		tileInfo = addLabel(2, Align.topLeft, 25, height - 25);
 
 		addImageButton(14, Align.topRight, width - 25, height - 25, new JInputListener() {
 			@Override

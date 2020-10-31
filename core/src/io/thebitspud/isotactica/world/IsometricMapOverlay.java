@@ -2,7 +2,6 @@ package io.thebitspud.isotactica.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.screens.GameScreen;
@@ -28,7 +27,7 @@ public class IsometricMapOverlay {
 
 	/**
 	 * Highlights the tile the player's mouse is currently hovering over.
-	 * More will be added soon
+	 * This function is currently incomplete
 	 */
 
 	private void highlightTiles() {
@@ -39,11 +38,14 @@ public class IsometricMapOverlay {
 			return;
 		}
 
+		String coordText = "[" + coord.x + "," + coord.y + "]";
+		String tileText = world.getTileID(coord.x, coord.y).getTileInfo();
+
 		// displaying the info of the tile being hovered over
-		gScreen.setTileInfoText("(" + coord.x + ", " + coord.y + ")");
+		gScreen.setTileInfoText(coordText + tileText);
 
 		// drawing the highlight texture
-		Vector2 highlightPos = getPointerPosition(coord);
+		Point highlightPos = getPointerPosition(coord);
 		game.getBatch().draw(game.getAssets().highlights[0], highlightPos.x, highlightPos.y,
 				game.TILE_WIDTH / mapCamera.zoom, game.TILE_HEIGHT / mapCamera.zoom);
 	}
@@ -71,13 +73,13 @@ public class IsometricMapOverlay {
 	 * Retrieves the exact pixel location (relative to the screen) of a given coordinate.
 	 * @param coord the grid coordinate of the given tile
 	 */
-	public Vector2 getPointerPosition(Point coord) {
+	public Point getPointerPosition(Point coord) {
 		int coordSum = coord.x + coord.y + 1;
 		float worldY = game.TILE_HEIGHT * (world.getWidth() - coordSum) / 2f;
 		float worldX = game.TILE_WIDTH * (worldY / game.TILE_HEIGHT + coord.y);
 
 		Vector3 worldPos = new Vector3(worldX, worldY, 0);
 		Vector3 screenPos = mapCamera.project(worldPos);
-		return new Vector2(screenPos.x, screenPos.y);
+		return new Point(Math.round(screenPos.x), Math.round(screenPos.y));
 	}
 }

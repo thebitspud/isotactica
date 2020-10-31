@@ -4,9 +4,9 @@
   <tileoffset x="0" y="16"/>
   <image source="common_iso.png" width="512" height="384"/>
  </tileset>
- <layer id="1" name="Tile Layer 1" width="9" height="9">
+ <layer id="1" name="Ground" width="9" height="9">
   <data encoding="base64" compression="zlib">
-   eJx9jksKACAIBZ9aiz73P28tFORRLobAGTQFoIlBbPJVA3+FfHeigTdCvqc50x6NkefG/JY9dlR7wu/PP4J5WZcD4hgBRQ==
+   eJxjYWBgYEHCnGiYFSrORqQaEGbGIs+KZg+yWUxIahixYCYcahjQ1LCiqWFAUoNuBja70OV5CKjhAmJuIAYA+ywBWQ==
   </data>
  </layer>
 </map>
