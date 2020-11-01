@@ -10,6 +10,11 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import io.thebitspud.isotactica.Isotactica;
+import io.thebitspud.isotactica.world.entities.Entity;
+import io.thebitspud.isotactica.world.entities.MapObject;
+import io.thebitspud.isotactica.world.entities.Unit;
+
+import java.util.ArrayList;
 
 /**
  * The game world in which combat encounters are processed and resolved.
@@ -27,12 +32,17 @@ public class World {
 
 	private int width, height;
 
+	// EXPERIMENTAL
+	private ArrayList<Entity> entities;
+
 	public World(Isotactica game) {
 		this.game = game;
 
 		mapCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		mapOverlay = new IsometricMapOverlay(game, this);
 		input = new WorldInputHandler(this);
+
+		entities = new ArrayList<>();
 	}
 
 	public void load(String levelName) {
@@ -44,6 +54,10 @@ public class World {
 		mapCamera.zoom = 0.5f;
 		mapCamera.position.x = width * game.TILE_WIDTH / 2f;
 		mapCamera.position.y = 0;
+
+		entities.clear();
+		entities.add(new Unit(4, 2, Unit.ID.WARRIOR, game));
+		entities.add(new MapObject(3, 6, MapObject.ID.ROCK, game));
 	}
 
 	public void tick(float delta) {
@@ -55,7 +69,11 @@ public class World {
 	public void render() {
 		mapRenderer.setView(mapCamera);
 		mapRenderer.render();
+
+		game.getBatch().begin();
 		mapOverlay.render();
+		for(Entity e: entities) e.render();
+		game.getBatch().end();
 	}
 
 	public void dispose() {
@@ -92,7 +110,6 @@ public class World {
 		else return null;
 	}
 
-
 	public void setTile(int x, int y, TileID id) {
 		getTile(x, y).setId(id.getIndex() == 7 ? id.getIndex() : 8);
 	}
@@ -118,6 +135,10 @@ public class World {
 
 	public OrthographicCamera getMapCamera() {
 		return mapCamera;
+	}
+
+	public IsometricMapOverlay getMapOverlay() {
+		return mapOverlay;
 	}
 
 	public int getWidth() {

@@ -17,14 +17,14 @@ public class Isotactica extends Game {
 	public final int TILE_WIDTH = 64;
 	public final int TILE_HEIGHT = 32;
 
-	private AssetHandler assets;
-	private SpriteBatch batch;
-	private World world;
-
 	/** An enum of all accessible screens */
 	public enum ScreenKey {
 		TITLE, GAME, PAUSE
 	}
+
+	private AssetHandler assets;
+	private SpriteBatch batch;
+	private World world;
 
 	private EnumMap<ScreenKey, JScreenTemplate> screens;
 

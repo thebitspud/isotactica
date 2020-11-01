@@ -25,9 +25,7 @@ public class IsometricMapOverlay {
 	}
 
 	public void render() {
-		game.getBatch().begin();
 		highlightTiles();
-		game.getBatch().end();
 	}
 
 	/**

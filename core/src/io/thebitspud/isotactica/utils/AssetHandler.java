@@ -14,6 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import io.thebitspud.isotactica.Isotactica;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
+import java.awt.*;
+import java.util.Arrays;
+
 /**
  * An extension of the AssetManager class that loads and assigns all asset files
  */
@@ -23,7 +26,7 @@ public class AssetHandler extends AssetManager {
 	private ShapeDrawer drawer;
 
 	private TextureRegion pixel;
-	public TextureRegion[] highlights;
+	public TextureRegion[] highlights, units, mapObjects;
 	public TextureRegionDrawable[][] buttons;
 	public Label.LabelStyle[] montserrat;
 
@@ -33,6 +36,8 @@ public class AssetHandler extends AssetManager {
 		buttons = new TextureRegionDrawable[16][3];
 		montserrat = new Label.LabelStyle[4];
 		highlights = new TextureRegion[8];
+		units = new TextureRegion[8];
+		mapObjects =  new TextureRegion[8];
 	}
 
 	/* Loader Functions */
@@ -53,7 +58,9 @@ public class AssetHandler extends AssetManager {
 		load("buttons.png", Texture.class);
 		load("common_iso.png", Texture.class);
 		load("highlights.png", Texture.class);
+		load("mapObjects.png", Texture.class);
 		load("pixel.png", Texture.class);
+		load("units.png", Texture.class);
 
 		setLoader(TiledMap.class, new TmxMapLoader());
 		load("isotest.tmx", TiledMap.class);
@@ -80,6 +87,8 @@ public class AssetHandler extends AssetManager {
 		// Retrieving sheets
 		final Texture buttonSheet = this.get("buttons.png", Texture.class);
 		final Texture highlightSheet = this.get("highlights.png", Texture.class);
+		final Texture unitSheet = this.get("units.png", Texture.class);
+		final Texture mapObjectSheet = this.get("mapObjects.png", Texture.class);
 		pixel = new TextureRegion(this.get("pixel.png", Texture.class));
 
 		// Assigning textures
@@ -91,6 +100,14 @@ public class AssetHandler extends AssetManager {
 
 		for (int i = 0; i < highlights.length; i++) {
 			highlights[i] = new TextureRegion(highlightSheet, i * 64, 0, 64, 32);
+		}
+
+		for (int i = 0; i < units.length; i++) {
+			units[i] = new TextureRegion(unitSheet, i % 4 * 64, i / 4 * 64, 64, 64);
+		}
+
+		for (int i = 0; i < mapObjects.length; i++) {
+			mapObjects[i] = new TextureRegion(mapObjectSheet, i % 4 * 64, i / 4 * 64, 64, 64);
 		}
 	}
 
@@ -122,5 +139,9 @@ public class AssetHandler extends AssetManager {
 		style.imageDown = button[2];
 
 		return style;
+	}
+
+	public ShapeDrawer getDrawer() {
+		return drawer;
 	}
 }

@@ -37,7 +37,7 @@ public enum TileID {
 
 	/** Get the index of the TileID which this function was called from */
 	public int getIndex() {
-		return Arrays.asList(TileID.values()).indexOf(this);
+		return this.ordinal();
 	}
 
 	/** Generates a formatted string containing relevant tile info */
