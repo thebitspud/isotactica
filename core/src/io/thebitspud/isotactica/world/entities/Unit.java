@@ -1,8 +1,8 @@
 package io.thebitspud.isotactica.world.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import io.thebitspud.isotactica.Isotactica;
-
-import java.awt.*;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class Unit extends Entity {
 	public enum ID {
@@ -45,6 +45,23 @@ public class Unit extends Entity {
 		}
 
 		super.render();
+		drawHealthBar();
+	}
+
+	/**
+	 * Draws a dynamic health bar above the unit.
+	 */
+	private void drawHealthBar() {
+		float healthPercent = (float) currentHealth / id.maxHealth * 100;
+		float width = getWidth() * getScaleX();
+		float height = 2 * getScaleY();
+		float xPos = getX() + width / 4;
+		float yPos = getY() + (getHeight() - 10) * getScaleY();
+
+		ShapeDrawer drawer = game.getAssets().getDrawer();
+		drawer.filledRectangle(xPos, yPos, width / 2, height, Color.BLACK);
+		drawer.setColor((100 - healthPercent) / 100f, healthPercent / 100f, 0, 1);
+		drawer.filledRectangle(xPos, yPos, width * healthPercent / 200,  height);
 	}
 
 	/* Unit Action Functions */
