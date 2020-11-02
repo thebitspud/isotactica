@@ -38,7 +38,7 @@ public class GameScreen extends JScreenTemplate {
 		addImageButton(11, Align.bottomRight, width - 25, 25, new JInputListener() {
 			@Override
 			public void onActivation() {
-				// world.nextPlayer();
+				world.nextPlayer();
 			}
 		});
 	}

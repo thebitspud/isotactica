@@ -77,7 +77,7 @@ public abstract class JScreenTemplate implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		initStageComponents(width, height);
+
 	}
 
 	@Override

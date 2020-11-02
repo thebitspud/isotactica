@@ -35,17 +35,17 @@ public class IsometricMapOverlay {
 	 * This function is currently a WIP
 	 */
 	private void highlightTiles() {
-		GameScreen gScreen = ((GameScreen) game.getScreen(Isotactica.ScreenKey.GAME));
+		GameScreen gameScreen = ((GameScreen) game.getScreen(Isotactica.ScreenKey.GAME));
 		Point coord = getCoordinateFromPointer(Gdx.input.getX(), Gdx.input.getY());
 		Entity hoveredUnit = world.getUnit(coord);
 
-		if (coord == null) gScreen.setTileInfoText("");
+		if (coord == null) gameScreen.setTileInfoText("");
 		else {
 			// displaying the info of the tile being hovered over
 			String coordText = "[" + coord.x + "," + coord.y + "]";
 			String tileText = world.getTileID(coord).getTileInfo();
 			String unitInfo = (hoveredUnit == null) ? "" : "\n\n" + hoveredUnit.getInfo();
-			gScreen.setTileInfoText(coordText + tileText + unitInfo);
+			gameScreen.setTileInfoText(coordText + tileText + unitInfo);
 
 			// drawing the highlight texture
 			Point highlightPos = getPointerPosition(coord);
@@ -53,6 +53,7 @@ public class IsometricMapOverlay {
 					game.TILE_WIDTH / mapCamera.zoom, game.TILE_HEIGHT / mapCamera.zoom);
 		}
 
+		// highlighting the currently selected unit
 		Entity selectedUnit = world.getInput().getSelectedUnit();
 		if (selectedUnit != null) {
 			int index = 3;

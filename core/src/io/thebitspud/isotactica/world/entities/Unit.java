@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import io.thebitspud.isotactica.Isotactica;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
+import java.awt.*;
+
 public class Unit extends Entity {
 	public enum ID {
 		WARRIOR (10, 2);
@@ -28,8 +30,8 @@ public class Unit extends Entity {
 	private int currentHealth;
 	private boolean canMove, canAct;
 
-	public Unit(int x, int y, ID id, Isotactica game) {
-		super(x, y, game.getAssets().units[id.ordinal()], game);
+	public Unit(Point coord, ID id, Isotactica game) {
+		super(coord, game.getAssets().units[id.ordinal()], game);
 
 		this.id = id;
 		currentHealth = id.maxHealth;

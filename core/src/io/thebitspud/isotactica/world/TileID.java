@@ -1,7 +1,5 @@
 package io.thebitspud.isotactica.world;
 
-import java.util.Arrays;
-
 /**
  * An enum of all possible tile types and their respective properties
  */
@@ -33,6 +31,10 @@ public enum TileID {
 
 	public MovementProfile getProfile() {
 		return profile;
+	}
+
+	public boolean isSolid() {
+		return profile == MovementProfile.NONE;
 	}
 
 	/** Get the index of the TileID which this function was called from */

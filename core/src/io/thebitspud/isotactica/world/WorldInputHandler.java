@@ -4,22 +4,25 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
+import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.world.entities.Entity;
-
-import java.awt.*;
 
 /**
  * A utility class that handles input events for the world map
  */
 
 public class WorldInputHandler implements InputProcessor {
+	private Isotactica game;
 	private World world;
 	private OrthographicCamera mapCamera;
 	private boolean[] keyPressed;
 	private boolean leftDown, rightDown;
 	private Entity selectedUnit;
 
-	public WorldInputHandler(World world) {
+	public WorldInputHandler(Isotactica game, World world) {
+		this.game = game;
 		this.world = world;
 		mapCamera = world.getMapCamera();
 
@@ -28,6 +31,7 @@ public class WorldInputHandler implements InputProcessor {
 
 	public void tick(float delta) {
 		getCameraInput(delta);
+		clampMapBounds();
 	}
 
 	private void getCameraInput(float delta) {
@@ -40,6 +44,23 @@ public class WorldInputHandler implements InputProcessor {
 
 		mapCamera.position.x += xVel * delta * mapCamera.zoom;
 		mapCamera.position.y += yVel * delta * mapCamera.zoom;
+	}
+
+	/** Keeps the camera's view properties within acceptable bounds */
+	private void clampMapBounds() {
+		Vector3 pos = mapCamera.position;
+
+		// Containing the camera's zoom
+		mapCamera.zoom = (float) MathUtils.clamp(mapCamera.zoom, 0.25, 1);
+
+		int pixelWidth = world.getWidth() * game.TILE_WIDTH;
+		int pixelHeight = world.getHeight() * game.TILE_HEIGHT;
+		float clampedX = MathUtils.clamp(pos.x, 0, pixelWidth);
+		float clampedY = MathUtils.clamp(pos.y, -pixelHeight / 2f, pixelHeight / 2f);
+
+		// Rounding the camera's position to fit integer pixel offsets based on the camera's zoom
+		pos.x = Math.round(clampedX / mapCamera.zoom) * mapCamera.zoom;
+		pos.y = Math.round(clampedY / mapCamera.zoom) * mapCamera.zoom;
 	}
 
 	@Override
@@ -121,5 +142,9 @@ public class WorldInputHandler implements InputProcessor {
 
 	public Entity getSelectedUnit() {
 		return selectedUnit;
+	}
+
+	public void deselectUnit() {
+		selectedUnit = null;
 	}
 }

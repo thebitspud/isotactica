@@ -18,12 +18,12 @@ public abstract class Entity extends Sprite {
 
 	protected boolean active;
 
-	public Entity(int x, int y, TextureRegion texture, Isotactica game) {
+	public Entity(Point coord, TextureRegion texture, Isotactica game) {
 		super(texture);
 		this.game = game;
-		world = game.getWorld();
+		this.coord = coord;
 
-		coord = new Point(x, y);
+		world = game.getWorld();
 		active = true;
 	}
 

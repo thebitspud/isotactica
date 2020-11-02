@@ -1,6 +1,7 @@
 package io.thebitspud.isotactica;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.thebitspud.isotactica.screens.*;
 import io.thebitspud.isotactica.utils.AssetHandler;
@@ -14,13 +15,13 @@ import java.util.EnumMap;
  */
 
 public class Isotactica extends Game {
-	public final int TILE_WIDTH = 64;
-	public final int TILE_HEIGHT = 32;
-
 	/** An enum of all accessible screens */
 	public enum ScreenKey {
 		TITLE, GAME, PAUSE
 	}
+
+	public final int TILE_WIDTH = 64;
+	public final int TILE_HEIGHT = 32;
 
 	private AssetHandler assets;
 	private SpriteBatch batch;
@@ -81,5 +82,6 @@ public class Isotactica extends Game {
 	/** Sets the active screen to the one which the specified key is mapped to */
 	public void setScreen(ScreenKey key) {
 		setScreen(screens.get(key));
+		Gdx.app.log("Set screen", "ScreenKey." + key);
 	}
 }

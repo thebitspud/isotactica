@@ -8,8 +8,9 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import io.thebitspud.isotactica.Isotactica;
+import io.thebitspud.isotactica.players.*;
+import io.thebitspud.isotactica.screens.GameScreen;
 import io.thebitspud.isotactica.world.entities.Entity;
 import io.thebitspud.isotactica.world.entities.MapObject;
 import io.thebitspud.isotactica.world.entities.Unit;
@@ -29,22 +30,23 @@ public class World {
 
 	private TiledMap map;
 	private TiledMapRenderer mapRenderer;
-	TiledMapTileLayer groundLayer;
+	private TiledMapTileLayer groundLayer;
 	private OrthographicCamera mapCamera;
 
-	private int width, height;
+	private int width, height, gameTurn, maxTurns, currentPlayerIndex;
 
-	// EXPERIMENTAL
-	private ArrayList<Entity> entities;
+	private ArrayList<Player> players;
+	private ArrayList<MapObject> mapObjects;
 
 	public World(Isotactica game) {
 		this.game = game;
 
 		mapCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		mapOverlay = new IsometricMapOverlay(game, this);
-		input = new WorldInputHandler(this);
+		input = new WorldInputHandler(game, this);
 
-		entities = new ArrayList<>();
+		mapObjects = new ArrayList<>();
+		players = new ArrayList<>();
 	}
 
 	public void load(String levelName) {
@@ -58,33 +60,25 @@ public class World {
 		mapCamera.position.x = width * game.TILE_WIDTH / 2f;
 		mapCamera.position.y = 0;
 
-		entities.clear();
-		entities.add(new Unit(4, 2, Unit.ID.WARRIOR, game));
-		entities.add(new MapObject(3, 6, MapObject.ID.ROCK, game));
+		players.clear();
+		players.add(new User(game));
+		players.add(new EnemyAI(game));
+		mapObjects.add(new MapObject(new Point(3, 4), MapObject.ID.ROCK, game));
+		mapObjects.add(new MapObject(new Point(4, 4), MapObject.ID.CRACKED_ROCK, game));
+
+		gameTurn = 1;
+		maxTurns = -1;
+		currentPlayerIndex = -1;
+
+		nextPlayer();
+		updateTurnInfo();
 	}
 
 	public void tick(float delta) {
 		input.tick(delta);
-		clampMapBounds();
 		mapCamera.update();
-		for (Entity e: entities) e.tick(delta);
-	}
-
-	/** Keeps the camera's view properties within acceptable bounds */
-	private void clampMapBounds() {
-		Vector3 pos = mapCamera.position;
-
-		// Containing the camera's zoom
-		mapCamera.zoom = (float) MathUtils.clamp(mapCamera.zoom, 0.25, 1);
-
-		int pixelWidth = width * game.TILE_WIDTH;
-		int pixelHeight = height * game.TILE_HEIGHT;
-		float clampedX = MathUtils.clamp(pos.x, 0, pixelWidth);
-		float clampedY = MathUtils.clamp(pos.y, -pixelHeight / 2f, pixelHeight / 2f);
-
-		// Rounding the camera's position to fit integer pixel offsets based on the camera's zoom
-		pos.x = Math.round(clampedX / mapCamera.zoom) * mapCamera.zoom;
-		pos.y = Math.round(clampedY / mapCamera.zoom) * mapCamera.zoom;
+		for (Player p: players) p.tick(delta);
+		for (MapObject o: mapObjects) o.tick(delta);
 	}
 
 	public void render() {
@@ -93,12 +87,41 @@ public class World {
 
 		game.getBatch().begin();
 		mapOverlay.render();
-		for (Entity e: entities) e.render();
+		for (Player p: players) p.render();
+		for (MapObject o: mapObjects) o.render();
 		game.getBatch().end();
 	}
 
 	public void dispose() {
 		map.dispose();
+	}
+
+	/* Turn Management Functions */
+
+	/**
+	 * Ends the current player's turn and starts the next player's turn.
+	 * Starts the next round if all players have completed their turns.
+	 */
+	public void nextPlayer() {
+		currentPlayerIndex++;
+
+		// Starting the next round
+		if(currentPlayerIndex >= players.size()) {
+			currentPlayerIndex = 0;
+			gameTurn += 1;
+			input.deselectUnit();
+			updateTurnInfo();
+		}
+
+		players.get(currentPlayerIndex).playTurn();
+	}
+
+	/** Updates the info that players see */
+	public void updateTurnInfo() {
+		GameScreen gameScreen = (GameScreen) game.getScreen(Isotactica.ScreenKey.GAME);
+		String turnText = "\nTurn " + gameTurn + ((maxTurns > 0) ? "/" + maxTurns : "");
+
+		gameScreen.setTurnInfoText(turnText);
 	}
 
 	/* Data Retrieval Functions */
@@ -139,9 +162,15 @@ public class World {
 	}
 
 	public Entity getUnit(Point coord) {
-		for (Entity e: entities)
-			if (e.getCoord().equals(coord))
-				return e;
+		for (Player p: players)
+			for (Unit u: p.getUnits())
+				if (u.getCoord().equals(coord))
+					return u;
+
+		for (MapObject o: mapObjects)
+			if (o.getCoord().equals(coord))
+				return o;
+
 		return null;
 	}
 

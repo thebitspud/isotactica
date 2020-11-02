@@ -2,6 +2,8 @@ package io.thebitspud.isotactica.world.entities;
 
 import io.thebitspud.isotactica.Isotactica;
 
+import java.awt.*;
+
 public class MapObject extends Entity {
 	public enum ID {
 		ROCK (10),
@@ -20,8 +22,8 @@ public class MapObject extends Entity {
 
 	private ID id;
 
-	public MapObject(int x, int y, ID id, Isotactica game) {
-		super(x, y, game.getAssets().mapObjects[id.ordinal()], game);
+	public MapObject(Point coord, ID id, Isotactica game) {
+		super(coord, game.getAssets().mapObjects[id.ordinal()], game);
 
 		this.id = id;
 	}
