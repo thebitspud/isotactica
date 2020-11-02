@@ -1,7 +1,8 @@
 package io.thebitspud.isotactica.world.entities;
 
-import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
+
+import java.awt.*;
 
 public class Unit extends Entity {
 	public enum ID {
@@ -32,6 +33,18 @@ public class Unit extends Entity {
 
 		this.id = id;
 		currentHealth = id.maxHealth;
+
+		nextTurn();
+	}
+
+	@Override
+	public void render() {
+		if (canMove || canAct) {
+			float scale = game.TILE_HEIGHT / world.getMapCamera().zoom;
+			game.getBatch().draw(game.getAssets().highlights[4], getX(), getY() + scale, scale * 2, scale);
+		}
+
+		super.render();
 	}
 
 	/* Unit Action Functions */

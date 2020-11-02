@@ -27,12 +27,14 @@ public abstract class Entity extends Sprite {
 		active = true;
 	}
 
-	public void render() {
+	public void tick(float delta) {
 		Point renderPosition = world.getMapOverlay().getPointerPosition(coord);
 		setPosition(renderPosition.x, renderPosition.y);
 		setOrigin(0, 0);
 		setScale(1 / world.getMapCamera().zoom);
+	}
 
+	public void render() {
 		draw(game.getBatch());
 	}
 

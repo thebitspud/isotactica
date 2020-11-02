@@ -67,6 +67,7 @@ public class World {
 		input.tick(delta);
 		clampMapBounds();
 		mapCamera.update();
+		for (Entity e: entities) e.tick(delta);
 	}
 
 	/** Keeps the camera's view properties within acceptable bounds */

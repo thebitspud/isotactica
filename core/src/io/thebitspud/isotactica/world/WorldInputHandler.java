@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import io.thebitspud.isotactica.world.entities.Entity;
+
+import java.awt.*;
 
 /**
  * A utility class that handles input events for the world map
@@ -14,6 +17,7 @@ public class WorldInputHandler implements InputProcessor {
 	private OrthographicCamera mapCamera;
 	private boolean[] keyPressed;
 	private boolean leftDown, rightDown;
+	private Entity selectedUnit;
 
 	public WorldInputHandler(World world) {
 		this.world = world;
@@ -61,11 +65,24 @@ public class WorldInputHandler implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		switch (button) {
-			case Input.Buttons.LEFT: leftDown = true; break;
-			case Input.Buttons.RIGHT: rightDown = true; break;
-			default: return false;
-		} return true;
+		if (button == Input.Buttons.LEFT) {
+			Entity e = world.getUnit(world.getMapOverlay().getCoordinateFromPointer(screenX, screenY));
+
+			if (e != null) {
+				if (selectedUnit == e) selectedUnit = null;
+				else selectedUnit = e;
+			} else selectedUnit = null;
+
+			leftDown = true;
+			return true;
+		}
+
+		if (button == Input.Buttons.RIGHT) {
+			rightDown = true;
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -100,5 +117,9 @@ public class WorldInputHandler implements InputProcessor {
 	public boolean scrolled(int amount) {
 		mapCamera.zoom *= Math.sqrt((amount > 0) ? 2 : 0.5);
 		return true;
+	}
+
+	public Entity getSelectedUnit() {
+		return selectedUnit;
 	}
 }

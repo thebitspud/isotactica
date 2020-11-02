@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.screens.GameScreen;
 import io.thebitspud.isotactica.world.entities.Entity;
+import io.thebitspud.isotactica.world.entities.Unit;
 
 import java.awt.*;
 
@@ -30,29 +31,35 @@ public class IsometricMapOverlay {
 	}
 
 	/**
-	 * Highlights the tile the player's mouse is currently hovering over.
-	 * This function is currently incomplete
+	 * Highlights relevant units and tiles.
+	 * This function is currently a WIP
 	 */
 	private void highlightTiles() {
 		GameScreen gScreen = ((GameScreen) game.getScreen(Isotactica.ScreenKey.GAME));
 		Point coord = getCoordinateFromPointer(Gdx.input.getX(), Gdx.input.getY());
-		if (coord == null) {
-			gScreen.setTileInfoText("");
-			return;
+		Entity hoveredUnit = world.getUnit(coord);
+
+		if (coord == null) gScreen.setTileInfoText("");
+		else {
+			// displaying the info of the tile being hovered over
+			String coordText = "[" + coord.x + "," + coord.y + "]";
+			String tileText = world.getTileID(coord).getTileInfo();
+			String unitInfo = (hoveredUnit == null) ? "" : "\n\n" + hoveredUnit.getInfo();
+			gScreen.setTileInfoText(coordText + tileText + unitInfo);
+
+			// drawing the highlight texture
+			Point highlightPos = getPointerPosition(coord);
+			game.getBatch().draw(game.getAssets().highlights[0], highlightPos.x, highlightPos.y,
+					game.TILE_WIDTH / mapCamera.zoom, game.TILE_HEIGHT / mapCamera.zoom);
 		}
 
-		Entity e = world.getUnit(coord);
-
-		// displaying the info of the tile being hovered over
-		String coordText = "[" + coord.x + "," + coord.y + "]";
-		String tileText = world.getTileID(coord).getTileInfo();
-		String unitInfo = (e == null) ? "" : "\n\n" + world.getUnit(coord).getInfo();
-		gScreen.setTileInfoText(coordText + tileText + unitInfo);
-
-		// drawing the highlight texture
-		Point highlightPos = getPointerPosition(coord);
-		game.getBatch().draw(game.getAssets().highlights[0], highlightPos.x, highlightPos.y,
-				game.TILE_WIDTH / mapCamera.zoom, game.TILE_HEIGHT / mapCamera.zoom);
+		Entity selectedUnit = world.getInput().getSelectedUnit();
+		if (selectedUnit != null) {
+			int index = 3;
+			if (selectedUnit.getClass() == Unit.class && ((Unit) selectedUnit).actionAvailable()) index = 2;
+			game.getBatch().draw(game.getAssets().highlights[index], selectedUnit.getX(), selectedUnit.getY(),
+					game.TILE_WIDTH / mapCamera.zoom, game.TILE_HEIGHT / mapCamera.zoom);
+		}
 	}
 
 	/**
