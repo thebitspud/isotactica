@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.screens.GameScreen;
+import io.thebitspud.isotactica.world.entities.Entity;
 
 import java.awt.*;
 
@@ -40,10 +41,13 @@ public class IsometricMapOverlay {
 			return;
 		}
 
+		Entity e = world.getUnit(coord);
+
 		// displaying the info of the tile being hovered over
 		String coordText = "[" + coord.x + "," + coord.y + "]";
-		String tileText = world.getTileID(coord.x, coord.y).getTileInfo();
-		gScreen.setTileInfoText(coordText + tileText);
+		String tileText = world.getTileID(coord).getTileInfo();
+		String unitInfo = (e == null) ? "" : "\n\n" + world.getUnit(coord).getInfo();
+		gScreen.setTileInfoText(coordText + tileText + unitInfo);
 
 		// drawing the highlight texture
 		Point highlightPos = getPointerPosition(coord);

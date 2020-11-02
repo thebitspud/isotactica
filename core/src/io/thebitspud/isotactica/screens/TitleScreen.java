@@ -37,10 +37,11 @@ public class TitleScreen extends JScreenTemplate {
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) game.setScreen(Isotactica.ScreenKey.GAME);
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) Gdx.app.exit();
 
+		stage.act();
+
 		Gdx.gl.glClearColor(0.2f, 0.6f, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		stage.act();
 		stage.draw();
 	}
 }

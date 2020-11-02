@@ -14,9 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import io.thebitspud.isotactica.Isotactica;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
-import java.awt.*;
-import java.util.Arrays;
-
 /**
  * An extension of the AssetManager class that loads and assigns all asset files
  */
@@ -51,7 +48,7 @@ public class AssetHandler extends AssetManager {
 		assignTextures();
 		assignAudio();
 
-		drawer = new ShapeDrawer(game.getBatch(), pixel);
+		Gdx.app.log("Assets loaded successfully", "");
 	}
 
 	private void loadFiles() {
@@ -63,7 +60,27 @@ public class AssetHandler extends AssetManager {
 		load("units.png", Texture.class);
 
 		setLoader(TiledMap.class, new TmxMapLoader());
-		load("isotest.tmx", TiledMap.class);
+	}
+
+	private String lastLevel;
+
+	/**
+	 * Loads an incoming Tiled map and unloads the last one
+	 * @param levelName the file name of the level without the file extension
+	 * @return the Tiled map that was just loaded
+	 */
+	public TiledMap loadMap(String levelName) {
+		if (lastLevel != null) {
+			game.getAssets().unload(lastLevel + ".tmx");
+			Gdx.app.log("Map unloaded", lastLevel + ".tmx");
+		}
+
+		lastLevel = levelName;
+		game.getAssets().load(levelName + ".tmx", TiledMap.class);
+		game.getAssets().finishLoading();
+		Gdx.app.log("Map loaded", levelName + ".tmx");
+
+		return game.getAssets().get(levelName + ".tmx", TiledMap.class);
 	}
 
 	private void generateFonts() {
@@ -84,12 +101,14 @@ public class AssetHandler extends AssetManager {
 	}
 
 	private void assignTextures() {
+		pixel = new TextureRegion(this.get("pixel.png", Texture.class));
+		drawer = new ShapeDrawer(game.getBatch(), pixel);
+
 		// Retrieving sheets
 		final Texture buttonSheet = this.get("buttons.png", Texture.class);
 		final Texture highlightSheet = this.get("highlights.png", Texture.class);
 		final Texture unitSheet = this.get("units.png", Texture.class);
 		final Texture mapObjectSheet = this.get("mapObjects.png", Texture.class);
-		pixel = new TextureRegion(this.get("pixel.png", Texture.class));
 
 		// Assigning textures
 		for (int i = 0; i < 15; i++) {

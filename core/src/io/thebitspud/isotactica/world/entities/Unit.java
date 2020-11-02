@@ -1,5 +1,6 @@
 package io.thebitspud.isotactica.world.entities;
 
+import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
 
 public class Unit extends Entity {
@@ -30,6 +31,7 @@ public class Unit extends Entity {
 		super(x, y, game.getAssets().units[id.ordinal()], game);
 
 		this.id = id;
+		currentHealth = id.maxHealth;
 	}
 
 	/* Unit Action Functions */
@@ -60,11 +62,12 @@ public class Unit extends Entity {
 
 	/* Getters and Setters */
 
-//	public String getUnitInfo() {
-//		String healthText = "\nHP: " + currentHealth + "/" + id.maxHealth;
-//		String statsText = "\nAgility: " + id.agility + "\nRange: " + id.range + "\nAttack: " + id.attack;
-//		return "Unit." + id + healthText + statsText;
-//	}
+	@Override
+	public String getInfo() {
+		String healthText = "\nHP: " + currentHealth + "/" + id.maxHealth;
+		String statsText = "\nAgility: " + id.agility;
+		return "Unit." + id + healthText + statsText;
+	}
 
 	public boolean moveAvailable() {
 		return canMove;
@@ -74,7 +77,7 @@ public class Unit extends Entity {
 		return canAct;
 	}
 
-	public ID getId() {
+	public ID getID() {
 		return id;
 	}
 }

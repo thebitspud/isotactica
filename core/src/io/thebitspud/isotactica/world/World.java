@@ -14,6 +14,7 @@ import io.thebitspud.isotactica.world.entities.Entity;
 import io.thebitspud.isotactica.world.entities.MapObject;
 import io.thebitspud.isotactica.world.entities.Unit;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -28,6 +29,7 @@ public class World {
 
 	private TiledMap map;
 	private TiledMapRenderer mapRenderer;
+	TiledMapTileLayer groundLayer;
 	private OrthographicCamera mapCamera;
 
 	private int width, height;
@@ -46,8 +48,9 @@ public class World {
 	}
 
 	public void load(String levelName) {
-		map = game.getAssets().get(levelName + ".tmx", TiledMap.class);
+		map = game.getAssets().loadMap(levelName);
 		mapRenderer = new IsometricTiledMapRenderer(map);
+		groundLayer = (TiledMapTileLayer) map.getLayers().get("Ground");
 		width = map.getProperties().get("width", Integer.class);
 		height = map.getProperties().get("height", Integer.class);
 
@@ -66,22 +69,6 @@ public class World {
 		mapCamera.update();
 	}
 
-	public void render() {
-		mapRenderer.setView(mapCamera);
-		mapRenderer.render();
-
-		game.getBatch().begin();
-		mapOverlay.render();
-		for(Entity e: entities) e.render();
-		game.getBatch().end();
-	}
-
-	public void dispose() {
-		map.dispose();
-	}
-
-	/* Utility Functions */
-
 	/** Keeps the camera's view properties within acceptable bounds */
 	private void clampMapBounds() {
 		Vector3 pos = mapCamera.position;
@@ -99,19 +86,42 @@ public class World {
 		pos.y = Math.round(clampedY / mapCamera.zoom) * mapCamera.zoom;
 	}
 
-	/** Retrieves the ground tile (if any) corresponding to the given coordinates */
-	public TiledMapTile getTile(int x, int y) {
-		// Note: x and y must be switched for some reason
-		int adjX = MathUtils.clamp(y, 0, height - 1);
-		int adjY = width - 1 - MathUtils.clamp(x, 0, width - 1);
+	public void render() {
+		mapRenderer.setView(mapCamera);
+		mapRenderer.render();
 
-		TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) map.getLayers().get("Ground")).getCell(adjX, adjY);
+		game.getBatch().begin();
+		mapOverlay.render();
+		for (Entity e: entities) e.render();
+		game.getBatch().end();
+	}
+
+	public void dispose() {
+		map.dispose();
+	}
+
+	/* Data Retrieval Functions */
+
+	/** Retrieves the ground tile (if any) corresponding to the given coordinates */
+	public TiledMapTile getTile(Point coord) {
+		// Note: x and y must be switched for some reason
+		int adjX = MathUtils.clamp(coord.y, 0, height - 1);
+		int adjY = width - MathUtils.clamp(coord.x, 0, width - 1) - 1;
+
+		TiledMapTileLayer.Cell cell = groundLayer.getCell(adjX, adjY);
 		if (cell != null) return cell.getTile();
 		else return null;
 	}
 
-	public void setTile(int x, int y, TileID id) {
-		getTile(x, y).setId(id.getIndex() == 7 ? id.getIndex() : 8);
+	// USAGE: if (world.getTileID(coord) != null) world.setTile(coord, TileID.BARREN);
+	/** Sets the tile at the given coordinates to match the specified TileID */
+	public void setTile(Point coord, TileID id) {
+		int adjX = MathUtils.clamp(coord.y, 0, height - 1);
+		int adjY = width - MathUtils.clamp(coord.x, 0, width - 1) - 1;
+
+		TiledMapTileLayer.Cell cell = groundLayer.getCell(adjX, adjY);
+		if (cell == null) groundLayer.setCell(adjX, adjY, cell = new TiledMapTileLayer.Cell());
+		cell.setTile(map.getTileSets().getTile(id.getIndex() == 6 ? 7 : id.getIndex()));
 	}
 
 	/** Retrieves the TileID corresponding to the given tile */
@@ -122,9 +132,16 @@ public class World {
 	}
 
 	/** Retrieves the TileID corresponding to the given coordinates */
-	public TileID getTileID(int x, int y) {
-		if(getTile(x, y) != null) return getTileID(getTile(x, y));
+	public TileID getTileID(Point coord) {
+		if (getTile(coord) != null) return getTileID(getTile(coord));
 		else return TileID.VOID;
+	}
+
+	public Entity getUnit(Point coord) {
+		for (Entity e: entities)
+			if (e.getCoord().equals(coord))
+				return e;
+		return null;
 	}
 
 	/* Getters and Setters */

@@ -36,6 +36,8 @@ public abstract class Entity extends Sprite {
 		draw(game.getBatch());
 	}
 
+	public abstract String getInfo();
+
 	public Point getCoord() {
 		return coord;
 	}
