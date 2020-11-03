@@ -23,7 +23,7 @@ public class User extends Player {
 
 	@Override
 	public void playTurn() {
-		for(Unit unit: units) unit.nextTurn();
+		for (Unit unit: units) unit.nextTurn();
 	}
 
 	@Override

@@ -12,7 +12,7 @@ public enum TileID {
 	SAND (MovementProfile.FAST),
 	SNOW (MovementProfile.SLOW),
 	LAVA (MovementProfile.NONE),
-	WATER (MovementProfile.SLOW);
+	WATER (MovementProfile.NONE);
 
 	/** An enum of possible states for movement on a tile */
 	enum MovementProfile {

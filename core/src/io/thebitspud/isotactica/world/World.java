@@ -36,6 +36,7 @@ public class World {
 	private int width, height, gameTurn, maxTurns, currentPlayerIndex;
 
 	private ArrayList<Player> players;
+	private User user;
 	private ArrayList<MapObject> mapObjects;
 
 	public World(Isotactica game) {
@@ -61,7 +62,7 @@ public class World {
 		mapCamera.position.y = 0;
 
 		players.clear();
-		players.add(new User(game));
+		players.add(user = new User(game));
 		players.add(new EnemyAI(game));
 		mapObjects.add(new MapObject(new Point(3, 4), MapObject.ID.ROCK, game));
 		mapObjects.add(new MapObject(new Point(4, 4), MapObject.ID.CRACKED_ROCK, game));
@@ -106,7 +107,7 @@ public class World {
 		currentPlayerIndex++;
 
 		// Starting the next round
-		if(currentPlayerIndex >= players.size()) {
+		if (currentPlayerIndex >= players.size()) {
 			currentPlayerIndex = 0;
 			gameTurn += 1;
 			input.deselectUnit();
@@ -161,7 +162,7 @@ public class World {
 		else return TileID.VOID;
 	}
 
-	public Entity getUnit(Point coord) {
+	public Entity getEntity(Point coord) {
 		for (Player p: players)
 			for (Unit u: p.getUnits())
 				if (u.getCoord().equals(coord))
@@ -186,6 +187,10 @@ public class World {
 
 	public IsometricMapOverlay getMapOverlay() {
 		return mapOverlay;
+	}
+
+	public User getUser() {
+		return user;
 	}
 
 	public int getWidth() {

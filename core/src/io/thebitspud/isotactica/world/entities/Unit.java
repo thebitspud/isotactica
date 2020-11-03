@@ -2,9 +2,11 @@ package io.thebitspud.isotactica.world.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import io.thebitspud.isotactica.Isotactica;
+import io.thebitspud.isotactica.players.Player;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.awt.*;
+import java.util.HashMap;
 
 public class Unit extends Entity {
 	public enum ID {
@@ -27,14 +29,19 @@ public class Unit extends Entity {
 	}
 
 	private ID id;
+	private Player player;
+
 	private int currentHealth;
 	private boolean canMove, canAct;
+	private HashMap<Point, Integer> moves;
 
-	public Unit(Point coord, ID id, Isotactica game) {
+	public Unit(Point coord, ID id, Player player, Isotactica game) {
 		super(coord, game.getAssets().units[id.ordinal()], game);
 
 		this.id = id;
+		this.player = player;
 		currentHealth = id.maxHealth;
+		moves = new HashMap<>();
 
 		nextTurn();
 	}
@@ -43,16 +50,14 @@ public class Unit extends Entity {
 	public void render() {
 		if (canMove || canAct) {
 			float scale = game.TILE_HEIGHT / world.getMapCamera().zoom;
-			game.getBatch().draw(game.getAssets().highlights[4], getX(), getY() + scale, scale * 2, scale);
+			game.getBatch().draw(game.getAssets().highlights[5], getX(), getY() + scale, scale * 2, scale);
 		}
 
 		super.render();
 		drawHealthBar();
 	}
 
-	/**
-	 * Draws a dynamic health bar above the unit.
-	 */
+	/** Draws a dynamic health bar above the unit. */
 	private void drawHealthBar() {
 		float healthPercent = (float) currentHealth / id.maxHealth * 100;
 		float width = getWidth() * getScaleX();
@@ -66,22 +71,71 @@ public class Unit extends Entity {
 		drawer.filledRectangle(xPos, yPos, width * healthPercent / 200,  height);
 	}
 
-	/* Unit Action Functions */
-
-	private void move() {
-		canMove = false;
+	/** Resets the unit's movement and action tokens and begins its next turn */
+	public void nextTurn() {
+		canAct = true;
+		canMove = true;
+		findMoves();
 	}
+
+	/* Movement-Related Functions */
+
+	/** Highlights all positions this unit can currently move to */
+	public void drawAvailableMoves() {
+		float scale = game.TILE_HEIGHT / world.getMapCamera().zoom;
+
+		for (Point move: moves.keySet()) {
+			Point drawPos = world.getMapOverlay().getPointerPosition(move);
+			game.getBatch().draw(game.getAssets().highlights[1], drawPos.x, drawPos.y, scale * 2, scale);
+		}
+	}
+
+	/** Attempts to move this unit to the specified grid location */
+	public void move(Point coord) {
+		if (!canMoveToTile(coord)) return;
+
+		canMove = false;
+		canAct = false;
+		this.coord = coord;
+		player.assessActions();
+	}
+
+	/** Checks whether this unit can be moved to the specified grid location */
+	public boolean canMoveToTile(Point coord) {
+		if (!canMove) return false;
+		return moves.containsKey(coord);
+	}
+
+	/** Uses a modified flood fill algorithm to determine which grid locations the unit can move to. */
+	public void findMoves() {
+		moves.clear();
+		if (!canMove) return;
+		findMoves(coord, id.agility);
+	}
+
+	private void findMoves(Point coord, int movesLeft) {
+		if (!player.tileAvailable(coord) && movesLeft < id.agility) return;
+		if (moves.containsKey(coord) && moves.get(coord) >= movesLeft) return;
+
+		moves.put(coord, movesLeft);
+		if (movesLeft <= 0) return;
+
+		findMoves(new Point(coord.x + 1, coord.y), movesLeft - 1);
+		findMoves(new Point(coord.x - 1, coord.y), movesLeft - 1);
+		findMoves(new Point(coord.x, coord.y + 1), movesLeft - 1);
+		findMoves(new Point(coord.x, coord.y - 1), movesLeft - 1);
+	}
+
+	/* Action-Related Functions */
 
 	private void act() {
 		canMove = false;
 		canAct = false;
 	}
 
-	public void nextTurn() {
-		canAct = true;
-		canMove = true;
-	}
+	/* Getters and Setters */
 
+	/** Increments or decrements the unit's health by the specified value */
 	public void adjustHealth(int value) {
 		currentHealth += value;
 
@@ -92,13 +146,16 @@ public class Unit extends Entity {
 		}
 	}
 
-	/* Getters and Setters */
 
 	@Override
 	public String getInfo() {
 		String healthText = "\nHP: " + currentHealth + "/" + id.maxHealth;
 		String statsText = "\nAgility: " + id.agility;
 		return "Unit." + id + healthText + statsText;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 
 	public boolean moveAvailable() {

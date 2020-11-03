@@ -32,20 +32,23 @@ public class IsometricMapOverlay {
 
 	/**
 	 * Highlights relevant units and tiles.
-	 * This function is currently a WIP
+	 * This is currently a WIP
 	 */
 	private void highlightTiles() {
 		GameScreen gameScreen = ((GameScreen) game.getScreen(Isotactica.ScreenKey.GAME));
 		Point coord = getCoordinateFromPointer(Gdx.input.getX(), Gdx.input.getY());
-		Entity hoveredUnit = world.getUnit(coord);
+
+		// Note that the hovered entity and selected entity are not always the same
+		Entity hoveredEntity = world.getEntity(coord);
+		Entity selectedEntity = world.getInput().getSelectedEntity();
 
 		if (coord == null) gameScreen.setTileInfoText("");
 		else {
 			// displaying the info of the tile being hovered over
 			String coordText = "[" + coord.x + "," + coord.y + "]";
 			String tileText = world.getTileID(coord).getTileInfo();
-			String unitInfo = (hoveredUnit == null) ? "" : "\n\n" + hoveredUnit.getInfo();
-			gameScreen.setTileInfoText(coordText + tileText + unitInfo);
+			String entityInfo = (hoveredEntity == null) ? "" : "\n\n" + hoveredEntity.getInfo();
+			gameScreen.setTileInfoText(coordText + tileText + entityInfo);
 
 			// drawing the highlight texture
 			Point highlightPos = getPointerPosition(coord);
@@ -53,12 +56,22 @@ public class IsometricMapOverlay {
 					game.TILE_WIDTH / mapCamera.zoom, game.TILE_HEIGHT / mapCamera.zoom);
 		}
 
-		// highlighting the currently selected unit
-		Entity selectedUnit = world.getInput().getSelectedUnit();
-		if (selectedUnit != null) {
+		 // Highlighting the currently selected unit
+		 // Yes, I'm aware that the index number is basically meaningless
+		if (selectedEntity != null) {
 			int index = 3;
-			if (selectedUnit.getClass() == Unit.class && ((Unit) selectedUnit).actionAvailable()) index = 2;
-			game.getBatch().draw(game.getAssets().highlights[index], selectedUnit.getX(), selectedUnit.getY(),
+
+			if (selectedEntity.getClass() == Unit.class) {
+				Unit selectedUnit = (Unit) selectedEntity;
+				if (selectedUnit.getPlayer().equals(world.getUser())) {
+					if (selectedUnit.actionAvailable()) {
+						index = 2;
+						selectedUnit.drawAvailableMoves();
+					}
+				} else index = 4;
+			}
+
+			game.getBatch().draw(game.getAssets().highlights[index], selectedEntity.getX(), selectedEntity.getY(),
 					game.TILE_WIDTH / mapCamera.zoom, game.TILE_HEIGHT / mapCamera.zoom);
 		}
 	}

@@ -8,6 +8,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.world.entities.Entity;
+import io.thebitspud.isotactica.world.entities.Unit;
+
+import java.awt.*;
 
 /**
  * A utility class that handles input events for the world map
@@ -19,7 +22,7 @@ public class WorldInputHandler implements InputProcessor {
 	private OrthographicCamera mapCamera;
 	private boolean[] keyPressed;
 	private boolean leftDown, rightDown;
-	private Entity selectedUnit;
+	private Entity selectedEntity;
 
 	public WorldInputHandler(Isotactica game, World world) {
 		this.game = game;
@@ -87,20 +90,28 @@ public class WorldInputHandler implements InputProcessor {
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if (button == Input.Buttons.LEFT) {
-			Entity e = world.getUnit(world.getMapOverlay().getCoordinateFromPointer(screenX, screenY));
+			Point coord = world.getMapOverlay().getCoordinateFromPointer(screenX, screenY);
+			Entity hoveredEntity = world.getEntity(coord);
 
-			if (e != null) {
-				if (selectedUnit == e) selectedUnit = null;
-				else selectedUnit = e;
-			} else selectedUnit = null;
+			// My sincerest apologies to anyone trying to read this
+			if (hoveredEntity != null) {
+				if (selectedEntity == hoveredEntity) selectedEntity = null;
+				else selectedEntity = hoveredEntity;
+			} else if (selectedEntity != null) {
+				if (selectedEntity.getClass() == Unit.class) {
+					Unit selectedUnit = ((Unit) selectedEntity);
+					if (selectedUnit.canMoveToTile(coord)) {
+						selectedUnit.move(coord);
+						if (!selectedUnit.actionAvailable()) selectedEntity = null;
+					} else selectedEntity = null;
+				} else selectedEntity = null;
+			}
 
-			leftDown = true;
-			return true;
+			return leftDown = true;
 		}
 
 		if (button == Input.Buttons.RIGHT) {
-			rightDown = true;
-			return true;
+			return rightDown = true;
 		}
 
 		return false;
@@ -140,11 +151,11 @@ public class WorldInputHandler implements InputProcessor {
 		return true;
 	}
 
-	public Entity getSelectedUnit() {
-		return selectedUnit;
+	public Entity getSelectedEntity() {
+		return selectedEntity;
 	}
 
 	public void deselectUnit() {
-		selectedUnit = null;
+		selectedEntity = null;
 	}
 }

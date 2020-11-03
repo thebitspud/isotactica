@@ -19,7 +19,7 @@ public class EnemyAI extends Player {
 
 	@Override
 	public void playTurn() {
-		for(Unit unit: units) {
+		for (Unit unit: units) {
 			unit.nextTurn();
 		}
 
