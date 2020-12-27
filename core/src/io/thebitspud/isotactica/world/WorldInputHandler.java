@@ -32,6 +32,10 @@ public class WorldInputHandler implements InputProcessor {
 		keyPressed = new boolean[256];
 	}
 
+	public void init() {
+		selectedEntity = null;
+	}
+
 	public void tick(float delta) {
 		getCameraInput(delta);
 		clampMapBounds();

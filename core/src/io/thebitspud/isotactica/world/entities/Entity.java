@@ -44,6 +44,7 @@ public abstract class Entity extends Sprite {
 		return coord;
 	}
 
+	/** The z-index of the entity */
 	public int getZIndex() {
 		return coord.x + coord.y;
 	}

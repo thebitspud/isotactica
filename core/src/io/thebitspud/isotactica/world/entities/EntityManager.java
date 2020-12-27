@@ -1,20 +1,22 @@
 package io.thebitspud.isotactica.world.entities;
 
 import io.thebitspud.isotactica.Isotactica;
-import io.thebitspud.isotactica.world.World;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class EntityManager {
 	private Isotactica game;
 
 	private ArrayList<Entity> entities;
+	private Comparator<Entity> renderSort;
 
-	public EntityManager(Isotactica game, World world) {
+	public EntityManager(Isotactica game) {
 		this.game = game;
 
 		entities = new ArrayList<>();
+		renderSort = Comparator.comparingInt(Entity::getZIndex);
 	}
 
 	public void init() {
@@ -25,6 +27,7 @@ public class EntityManager {
 
 	public void tick(float delta) {
 		for (Entity e: entities) e.tick(delta);
+		entities.sort(renderSort);
 	}
 
 	public void render() {
@@ -33,15 +36,11 @@ public class EntityManager {
 
 	/** Adds the specified entity to the game */
 	public void addEntity(Entity e) {
-		if (e == null) return;
-		int index = 0;
-		// determine index relative to other entities here (binary sort?)
-		entities.add(index, e);
+		entities.add(e);
 	}
 
 	/** Removes the specified entity from the game */
 	public void removeEntity(Entity e) {
-		if (e == null) return;
 		entities.remove(e);
 	}
 

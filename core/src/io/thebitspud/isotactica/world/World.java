@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.MathUtils;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.players.*;
 import io.thebitspud.isotactica.screens.GameScreen;
-import io.thebitspud.isotactica.world.entities.Entity;
 import io.thebitspud.isotactica.world.entities.EntityManager;
 
 import java.awt.*;
@@ -44,7 +43,7 @@ public class World {
 		mapCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		mapOverlay = new IsometricMapOverlay(game, this);
 		input = new WorldInputHandler(game, this);
-		entityManager = new EntityManager(game, this);
+		entityManager = new EntityManager(game);
 
 		players = new ArrayList<>();
 	}
@@ -60,7 +59,9 @@ public class World {
 		mapCamera.position.x = width * game.TILE_WIDTH / 2f;
 		mapCamera.position.y = 0;
 
+		input.init();
 		entityManager.init();
+
 		players.clear();
 		players.add(user = new User(game));
 		players.add(new EnemyAI(game));
