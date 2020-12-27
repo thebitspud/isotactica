@@ -7,6 +7,10 @@ import com.badlogic.gdx.utils.Align;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.utils.JInputListener;
 
+/**
+ * The screen that displays the game's main menu
+ */
+
 public class TitleScreen extends JScreenTemplate {
 	public TitleScreen(Isotactica game) {
 		super(game);

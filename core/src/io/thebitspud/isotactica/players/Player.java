@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 /**
- * Any agent (human or AI) that controls units on the battlefield
+ * Any agent (human or AI) that controls units on the field
  */
 
 public abstract class Player {
@@ -50,9 +50,16 @@ public abstract class Player {
 	}
 
 	/**
-	 * Checks if a grid tile is open to being spawned on or moved to
-	 * @param coord the grid coordinate to be checked
+	 * Attempts to spawn a unit according to the specified parameters
+	 * @param x the x-coord on the grid where the unit is to be spawned
+	 * @param y the y-coord on the grid where the unit is to be spawned
+	 * @param id the Unit ID of the unit to be spawned
 	 */
+	public void spawnUnit(int x, int y, Unit.ID id) {
+		spawnUnit(new Point(x, y), id);
+	}
+
+	/** Checks if a grid tile is open to being spawned on or moved to */
 	public boolean tileAvailable(Point coord) {
 		if (coord.x < 0 || coord.x > world.getWidth() - 1) return false;
 		if (coord.y < 0 || coord.y > world.getHeight() - 1) return false;

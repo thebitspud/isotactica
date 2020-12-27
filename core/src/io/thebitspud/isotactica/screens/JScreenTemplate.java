@@ -33,7 +33,8 @@ public abstract class JScreenTemplate implements Screen {
 		initStageComponents(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 
-	/** Initializes all relevant actors on a screen
+	/**
+	 * Initializes properties for all relevant actors on a screen
 	 * @param height the current width of the client window
 	 * @param width the current width of the client window
 	 */

@@ -7,6 +7,10 @@ import com.badlogic.gdx.utils.Align;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.utils.JInputListener;
 
+/**
+ * The screen that displays the game's pause menu
+ */
+
 public class PauseScreen extends JScreenTemplate {
 	public PauseScreen(Isotactica game) {
 		super(game);

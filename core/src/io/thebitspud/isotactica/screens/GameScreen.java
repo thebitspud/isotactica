@@ -10,6 +10,10 @@ import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.utils.JInputListener;
 import io.thebitspud.isotactica.world.World;
 
+/**
+ * The screen on which the core gameplay loop runs
+ */
+
 public class GameScreen extends JScreenTemplate {
 	private InputMultiplexer multiplexer;
 	private World world;

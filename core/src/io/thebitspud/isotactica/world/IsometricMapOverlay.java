@@ -30,10 +30,7 @@ public class IsometricMapOverlay {
 		highlightTiles();
 	}
 
-	/**
-	 * Highlights relevant units and tiles.
-	 * This is currently a WIP
-	 */
+	/** Highlights relevant units and tiles. */
 	private void highlightTiles() {
 		GameScreen gameScreen = ((GameScreen) game.getScreen(Isotactica.ScreenKey.GAME));
 		Point coord = getCoordinateFromPointer(Gdx.input.getX(), Gdx.input.getY());
@@ -57,7 +54,6 @@ public class IsometricMapOverlay {
 		}
 
 		 // Highlighting the currently selected unit
-		 // Yes, I'm aware that the index number is basically meaningless
 		if (selectedEntity != null) {
 			int index = 3;
 

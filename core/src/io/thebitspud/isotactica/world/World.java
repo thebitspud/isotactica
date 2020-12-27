@@ -162,6 +162,7 @@ public class World {
 		else return TileID.VOID;
 	}
 
+	/** Re */
 	public Entity getEntity(Point coord) {
 		for (Player p: players)
 			for (Unit u: p.getUnits())

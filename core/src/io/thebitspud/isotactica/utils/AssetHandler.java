@@ -21,8 +21,8 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 public class AssetHandler extends AssetManager {
 	private Isotactica game;
 	private ShapeDrawer drawer;
+	private String lastLevel;
 
-	private TextureRegion pixel;
 	public TextureRegion[] highlights, units, mapObjects;
 	public TextureRegionDrawable[][] buttons;
 	public Label.LabelStyle[] montserrat;
@@ -48,7 +48,7 @@ public class AssetHandler extends AssetManager {
 		assignTextures();
 		assignAudio();
 
-		Gdx.app.log("Assets loaded successfully", "");
+		Gdx.app.log("Files loaded", getLoadedAssets() + " items");
 	}
 
 	private void loadFiles() {
@@ -62,10 +62,8 @@ public class AssetHandler extends AssetManager {
 		setLoader(TiledMap.class, new TmxMapLoader());
 	}
 
-	private String lastLevel;
-
 	/**
-	 * Loads an incoming Tiled map and unloads the last one
+	 * Loads an incoming Tiled map after unloading the current one
 	 * @param levelName the file name of the level without the file extension
 	 * @return the Tiled map that was just loaded
 	 */
@@ -84,10 +82,12 @@ public class AssetHandler extends AssetManager {
 	}
 
 	private void generateFonts() {
+		// Loading in FreeType fonts
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Montserrat-Regular.ttf"));
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		parameter.incremental = true;
 
+		// Converting generated fonts into bitmap label styles
 		parameter.size = 96;
 		montserrat[0] = new Label.LabelStyle(generator.generateFont(parameter), Color.WHITE);
 		parameter.size = 48;
@@ -101,7 +101,8 @@ public class AssetHandler extends AssetManager {
 	}
 
 	private void assignTextures() {
-		pixel = new TextureRegion(this.get("pixel.png", Texture.class));
+		// Initializing the ShapeDrawer
+		final TextureRegion pixel = new TextureRegion(this.get("pixel.png", Texture.class));
 		drawer = new ShapeDrawer(game.getBatch(), pixel);
 
 		// Retrieving sheets
@@ -131,7 +132,7 @@ public class AssetHandler extends AssetManager {
 	}
 
 	private void assignAudio() {
-
+		// WIP
 	}
 
 	/* Asset Retrieval Functions */
@@ -150,6 +151,7 @@ public class AssetHandler extends AssetManager {
 		return button;
 	}
 
+	/** Returns an ImageButtonStyle based on a preset button texture */
 	public ImageButton.ImageButtonStyle getButtonStyle(TextureRegionDrawable[] button) {
 		ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
 
