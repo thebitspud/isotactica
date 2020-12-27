@@ -2,6 +2,7 @@ package io.thebitspud.isotactica.players;
 
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.world.World;
+import io.thebitspud.isotactica.world.entities.EntityManager;
 import io.thebitspud.isotactica.world.entities.Unit;
 
 import java.awt.*;
@@ -15,26 +16,25 @@ public abstract class Player {
 	protected Isotactica game;
 	protected World world;
 	protected ArrayList<Unit> units;
+	protected EntityManager entityManager;
 
 	public Player(Isotactica game) {
 		this.game = game;
 		world = game.getWorld();
+		entityManager = world.getEntityManager();
 
 		units = new ArrayList<>();
 		initUnits();
 	}
 
-	public void tick(float delta) {
+	public void update() {
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
-			if (!unit.isActive()) units.remove(unit);
+			if (!unit.isActive()) {
+				units.remove(unit);
+				entityManager.removeEntity(unit);
+			}
 		}
-
-		for (Unit unit: units) unit.tick(delta);
-	}
-
-	public void render() {
-		for (Unit unit: units) unit.render();
 	}
 
 	/**
@@ -47,6 +47,7 @@ public abstract class Player {
 
 		Unit unit = new Unit(coord, id, this, game);
 		units.add(unit);
+		entityManager.addEntity(unit);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public abstract class Player {
 		if (coord.x < 0 || coord.x > world.getWidth() - 1) return false;
 		if (coord.y < 0 || coord.y > world.getHeight() - 1) return false;
 		if (world.getTileID(coord).isSolid()) return false;
-		return world.getEntity(coord) == null;
+		return world.getEntityManager().getEntity(coord) == null;
 	}
 
 	/** Iterates through the player's owned units to determine the actions available to them. */

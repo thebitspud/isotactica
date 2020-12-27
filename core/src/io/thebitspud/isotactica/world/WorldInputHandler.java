@@ -91,7 +91,7 @@ public class WorldInputHandler implements InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if (button == Input.Buttons.LEFT) {
 			Point coord = world.getMapOverlay().getCoordinateFromPointer(screenX, screenY);
-			Entity hoveredEntity = world.getEntity(coord);
+			Entity hoveredEntity = world.getEntityManager().getEntity(coord);
 
 			// My sincerest apologies to anyone trying to read this
 			if (hoveredEntity != null) {

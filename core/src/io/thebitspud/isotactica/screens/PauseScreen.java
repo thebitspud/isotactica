@@ -25,20 +25,20 @@ public class PauseScreen extends JScreenTemplate {
 		addImageButton(3, Align.center, width * 0.5f, height * 0.6f, new JInputListener() {
 			@Override
 			public void onActivation() {
-				game.setScreen(game.getScreen(Isotactica.ScreenKey.GAME));
+				game.setScreen(Isotactica.ScreenKey.GAME);
 			}
 		});
 		addImageButton(4, Align.center, width * 0.5f, height * 0.4f, new JInputListener() {
 			@Override
 			public void onActivation() {
-				game.setScreen(game.getScreen(Isotactica.ScreenKey.GAME));
+				game.setScreen(Isotactica.ScreenKey.GAME);
 				game.getWorld().load("isotest");
 			}
 		});
 		addImageButton(5, Align.center, width * 0.5f, height * 0.2f, new JInputListener() {
 			@Override
 			public void onActivation() {
-				game.setScreen(game.getScreen(Isotactica.ScreenKey.TITLE));
+				game.setScreen(Isotactica.ScreenKey.TITLE);
 			}
 		});
 	}

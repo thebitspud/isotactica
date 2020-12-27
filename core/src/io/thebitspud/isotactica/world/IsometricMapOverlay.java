@@ -36,7 +36,7 @@ public class IsometricMapOverlay {
 		Point coord = getCoordinateFromPointer(Gdx.input.getX(), Gdx.input.getY());
 
 		// Note that the hovered entity and selected entity are not always the same
-		Entity hoveredEntity = world.getEntity(coord);
+		Entity hoveredEntity = world.getEntityManager().getEntity(coord);
 		Entity selectedEntity = world.getInput().getSelectedEntity();
 
 		if (coord == null) gameScreen.setTileInfoText("");

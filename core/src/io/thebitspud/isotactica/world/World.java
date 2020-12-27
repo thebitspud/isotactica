@@ -12,8 +12,7 @@ import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.players.*;
 import io.thebitspud.isotactica.screens.GameScreen;
 import io.thebitspud.isotactica.world.entities.Entity;
-import io.thebitspud.isotactica.world.entities.MapObject;
-import io.thebitspud.isotactica.world.entities.Unit;
+import io.thebitspud.isotactica.world.entities.EntityManager;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -27,17 +26,17 @@ public class World {
 	private Isotactica game;
 	private IsometricMapOverlay mapOverlay;
 	private WorldInputHandler input;
+	private EntityManager entityManager;
 
 	private TiledMap map;
 	private TiledMapRenderer mapRenderer;
 	private TiledMapTileLayer groundLayer;
 	private OrthographicCamera mapCamera;
 
-	private int width, height, gameTurn, maxTurns, currentPlayerIndex;
-
 	private ArrayList<Player> players;
 	private User user;
-	private ArrayList<MapObject> mapObjects;
+
+	private int width, height, gameTurn, maxTurns, currentPlayerIndex;
 
 	public World(Isotactica game) {
 		this.game = game;
@@ -45,8 +44,8 @@ public class World {
 		mapCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		mapOverlay = new IsometricMapOverlay(game, this);
 		input = new WorldInputHandler(game, this);
+		entityManager = new EntityManager(game, this);
 
-		mapObjects = new ArrayList<>();
 		players = new ArrayList<>();
 	}
 
@@ -61,11 +60,10 @@ public class World {
 		mapCamera.position.x = width * game.TILE_WIDTH / 2f;
 		mapCamera.position.y = 0;
 
+		entityManager.init();
 		players.clear();
 		players.add(user = new User(game));
 		players.add(new EnemyAI(game));
-		mapObjects.add(new MapObject(new Point(3, 4), MapObject.ID.ROCK, game));
-		mapObjects.add(new MapObject(new Point(4, 4), MapObject.ID.CRACKED_ROCK, game));
 
 		gameTurn = 1;
 		maxTurns = -1;
@@ -78,8 +76,8 @@ public class World {
 	public void tick(float delta) {
 		input.tick(delta);
 		mapCamera.update();
-		for (Player p: players) p.tick(delta);
-		for (MapObject o: mapObjects) o.tick(delta);
+		for (Player p: players) p.update();
+		entityManager.tick(delta);
 	}
 
 	public void render() {
@@ -88,8 +86,7 @@ public class World {
 
 		game.getBatch().begin();
 		mapOverlay.render();
-		for (Player p: players) p.render();
-		for (MapObject o: mapObjects) o.render();
+		entityManager.render();
 		game.getBatch().end();
 	}
 
@@ -162,20 +159,6 @@ public class World {
 		else return TileID.VOID;
 	}
 
-	/** Re */
-	public Entity getEntity(Point coord) {
-		for (Player p: players)
-			for (Unit u: p.getUnits())
-				if (u.getCoord().equals(coord))
-					return u;
-
-		for (MapObject o: mapObjects)
-			if (o.getCoord().equals(coord))
-				return o;
-
-		return null;
-	}
-
 	/* Getters and Setters */
 
 	public WorldInputHandler getInput() {
@@ -188,6 +171,10 @@ public class World {
 
 	public IsometricMapOverlay getMapOverlay() {
 		return mapOverlay;
+	}
+
+	public EntityManager getEntityManager() {
+		return entityManager;
 	}
 
 	public User getUser() {

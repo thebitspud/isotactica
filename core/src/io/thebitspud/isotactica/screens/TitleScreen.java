@@ -31,6 +31,7 @@ public class TitleScreen extends JScreenTemplate {
 		addImageButton(5, Align.center, width * 0.5f, height * 0.3f, new JInputListener() {
 			@Override
 			public void onActivation() {
+				Gdx.app.log("Application Terminated", "");
 				Gdx.app.exit();
 			}
 		});

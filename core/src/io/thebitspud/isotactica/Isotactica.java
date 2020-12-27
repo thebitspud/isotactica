@@ -45,7 +45,7 @@ public class Isotactica extends Game {
 		screens.put(ScreenKey.PAUSE, new PauseScreen(this));
 
 		world.load("isotest");
-		setScreen(getScreen(ScreenKey.TITLE));
+		setScreen(ScreenKey.TITLE);
 	}
 
 	@Override
@@ -70,7 +70,10 @@ public class Isotactica extends Game {
 		return batch;
 	}
 
-	/** Retrieves the screen which the specified key is mapped to */
+	/**
+	 * Retrieves the screen which the specified key is mapped to
+	 * Please use setScreen(key) instead of setScreen(getScreen(key)) to switch screens
+	 */
 	public JScreenTemplate getScreen(ScreenKey key) {
 		return screens.get(key);
 	}

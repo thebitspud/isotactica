@@ -44,6 +44,10 @@ public abstract class Entity extends Sprite {
 		return coord;
 	}
 
+	public int getZIndex() {
+		return coord.x + coord.y;
+	}
+
 	public boolean isActive() {
 		return active;
 	}
