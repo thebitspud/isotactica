@@ -1,11 +1,13 @@
 package io.thebitspud.isotactica.world.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.players.Player;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -18,13 +20,16 @@ public class Unit extends Entity {
 	 * This will be replaced with a more dynamic system in the future
 	 */
 	public enum ID {
-		WARRIOR (10, 2);
+		WARRIOR (10, 2, 1, 2),
+		GOBLIN_BRUTE (15, 2, 1, 1);
 
-		private final int maxHealth, agility;
+		private final int maxHealth, agility, range, attack;
 
-		ID(int maxHealth, int agility) {
+		ID(int maxHealth, int agility, int range, int attack) {
 			this.maxHealth = maxHealth;
 			this.agility = agility;
+			this.range = range;
+			this.attack = attack;
 		}
 
 		public int getMaxHealth() {
@@ -34,13 +39,27 @@ public class Unit extends Entity {
 		public int getAgility() {
 			return agility;
 		}
+
+		public int getRange() {
+			return range;
+		}
+
+		public int getAttack() {
+			return attack;
+		}
 	}
 
 	private ID id;
 	private Player player;
 
 	private boolean canMove, canAct;
+	/**
+	 * A HashMap of open locations this unit can move to
+	 * The integer value indicates the max number of remaining moves from a location
+	 */
 	private HashMap<Point, Integer> moves;
+	/** A list of entities this unit can attack */
+	private ArrayList<Entity> targets;
 
 	public Unit(Point coord, ID id, Player player, Isotactica game) {
 		super(coord, game.getAssets().units[id.ordinal()], game);
@@ -49,19 +68,30 @@ public class Unit extends Entity {
 		this.player = player;
 		currentHealth = id.maxHealth;
 		moves = new HashMap<>();
+		targets = new ArrayList<>();
 
 		nextTurn();
+
+		final String coordText = " at [" + coord.x + ", " + coord.y + "]";
+		Gdx.app.log("Unit spawned", "ID." + id + coordText);
 	}
+
+	/** Resets the unit's movement and action tokens and begins its next turn */
+	public void nextTurn() {
+		canAct = true;
+		canMove = true;
+
+		findMoves();
+		findTargets();
+	}
+
+	/* Widget Rendering */
 
 	@Override
 	public void render() {
-		if (canMove || canAct) {
-			float scale = game.TILE_HEIGHT / world.getMapCamera().zoom;
-			game.getBatch().draw(game.getAssets().highlights[5], getX(), getY() + scale, scale * 2, scale);
-		}
-
 		super.render();
 		drawHealthBar();
+		drawActionIndicator();
 	}
 
 	/** Draws a dynamic health bar above the unit. */
@@ -78,32 +108,43 @@ public class Unit extends Entity {
 		drawer.filledRectangle(xPos, yPos, width * healthPercent / 200,  height);
 	}
 
-	/** Resets the unit's movement and action tokens and begins its next turn */
-	public void nextTurn() {
-		canAct = true;
-		canMove = true;
-		findMoves();
+	/** Draws an indicator above a user unit to indicate an action is available. */
+	private void drawActionIndicator() {
+		if (player != world.getUser()) return;
+		if (!canMove && !canAct) return;
+
+		float scale = game.TILE_HEIGHT / world.getMapCamera().zoom;
+		game.getBatch().draw(game.getAssets().highlights[5], getX(), getY() + scale, scale * 2, scale);
 	}
 
-	/* Movement-Related Functions */
-
-	/** Highlights all positions this unit can currently move to */
-	public void drawAvailableMoves() {
+	/** Highlights all moves and actions available to this unit */
+	public void drawAvailableActions() {
 		float scale = game.TILE_HEIGHT / world.getMapCamera().zoom;
 
 		for (Point move: moves.keySet()) {
 			Point drawPos = world.getMapOverlay().getPointerPosition(move);
 			game.getBatch().draw(game.getAssets().highlights[1], drawPos.x, drawPos.y, scale * 2, scale);
 		}
+
+		for (Entity target: targets) {
+			Point drawPos = world.getMapOverlay().getPointerPosition(target.coord);
+			game.getBatch().draw(game.getAssets().highlights[4], drawPos.x, drawPos.y, scale * 2, scale);
+		}
 	}
+
+	/* Movement-Related Functions */
 
 	/** Attempts to move this unit to the specified grid location */
 	public void move(Point coord) {
 		if (!canMoveToTile(coord)) return;
 
+		final String lastCoordText = " from [" + this.coord.x + ", " + this.coord.y + "]";
+		final String newCoordText = " to [" + coord.x + ", " + coord.y + "]";
+		Gdx.app.log("Unit moved", "ID." + id + lastCoordText + newCoordText);
+
 		canMove = false;
-		canAct = false;
 		this.coord = coord;
+
 		entityManager.requireSort();
 		player.assessActions();
 	}
@@ -114,13 +155,18 @@ public class Unit extends Entity {
 		return moves.containsKey(coord);
 	}
 
-	/** Uses a modified flood fill algorithm to determine which grid locations the unit can move to. */
+	/** Compiles a list of grid locations this unit can currently move to. */
 	public void findMoves() {
 		moves.clear();
 		if (!canMove) return;
 		findMoves(coord, id.agility);
 	}
 
+	/**
+	 * Uses a modified flood fill algorithm to determine which grid locations the unit can move to.
+	 * @param coord The starting coordinate for the fill
+	 * @param movesLeft The number of remaining move cycles to be computed
+	 */
 	private void findMoves(Point coord, int movesLeft) {
 		if (!player.tileAvailable(coord) && movesLeft < id.agility) return;
 		if (moves.containsKey(coord) && moves.get(coord) >= movesLeft) return;
@@ -136,12 +182,42 @@ public class Unit extends Entity {
 
 	/* Action-Related Functions */
 
-	private void act() {
+	/** This unit attempts to attack a specified entity */
+	public void attack(Entity e) {
+		if (!canAttackEntity(e)) return;
+
+		Gdx.app.log("Unit attacked", "ID." + id);
+
 		canMove = false;
 		canAct = false;
+		e.adjustHealth(-id.attack);
+
+		player.assessActions();
 	}
 
-	/** Increments or decrements the unit's health by the specified value */
+	/** Checks whether this unit is able to attack the specified entity */
+	public boolean canAttackEntity(Entity e) {
+		if (!canAct) return false;
+		return targets.contains(e);
+	}
+
+	/** Compiles a list of all entities this unit is able to attack */
+	public void findTargets() {
+		targets.clear();
+		if (!canAct) return;
+
+		for (Entity e: entityManager.getEntityList()) {
+			if (!e.isActive()) continue;
+			if (e instanceof Unit && player == ((Unit) e).getPlayer()) continue;
+
+			int diffX = Math.abs(coord.x - e.getCoord().x);
+			int diffY = Math.abs(coord.y - e.getCoord().y);
+
+			if (diffX + diffY <= id.range) targets.add(e);
+		}
+	}
+
+	@Override
 	public void adjustHealth(int value) {
 		currentHealth += value;
 
@@ -171,9 +247,5 @@ public class Unit extends Entity {
 
 	public boolean actionAvailable() {
 		return canAct;
-	}
-
-	public ID getID() {
-		return id;
 	}
 }

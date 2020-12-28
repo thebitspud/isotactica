@@ -62,7 +62,7 @@ public class IsometricMapOverlay {
 				if (selectedUnit.getPlayer().equals(world.getUser())) {
 					if (selectedUnit.actionAvailable()) {
 						index = 2;
-						selectedUnit.drawAvailableMoves();
+						selectedUnit.drawAvailableActions();
 					}
 				} else index = 4;
 			}

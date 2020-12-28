@@ -43,8 +43,7 @@ public class Isotactica extends Game {
 		screens.put(ScreenKey.TITLE, new TitleScreen(this));
 		screens.put(ScreenKey.GAME, new GameScreen(this));
 		screens.put(ScreenKey.PAUSE, new PauseScreen(this));
-
-		world.load("isotest");
+		
 		setScreen(ScreenKey.TITLE);
 	}
 

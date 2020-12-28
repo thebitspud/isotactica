@@ -26,6 +26,7 @@ public class TitleScreen extends JScreenTemplate {
 			@Override
 			public void onActivation() {
 				game.setScreen(Isotactica.ScreenKey.GAME);
+				if (game.getAssets().getLastLevel() == null) game.getWorld().load("isotest");;
 			}
 		});
 		addImageButton(5, Align.center, width * 0.5f, height * 0.3f, new JInputListener() {

@@ -1,6 +1,8 @@
 package io.thebitspud.isotactica.world.entities;
 
 import io.thebitspud.isotactica.Isotactica;
+import io.thebitspud.isotactica.players.Player;
+import io.thebitspud.isotactica.world.World;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,13 +14,15 @@ import java.util.Comparator;
 
 public class EntityManager {
 	private Isotactica game;
+	private World world;
 
 	private ArrayList<Entity> entities;
 	private Comparator<Entity> renderSort;
 	private boolean sortOutdated;
 
-	public EntityManager(Isotactica game) {
+	public EntityManager(Isotactica game, World world) {
 		this.game = game;
+		this.world = world;
 
 		entities = new ArrayList<>();
 		renderSort = Comparator.comparingDouble(Entity::getY);
@@ -31,7 +35,18 @@ public class EntityManager {
 	}
 
 	public void tick(float delta) {
-		for (Entity e: entities) e.tick(delta);
+		for (int i = 0; i < entities.size(); i++) {
+			Entity e = entities.get(i);
+
+			if (!e.isActive()) {
+				entities.remove(e);
+				world.updatePlayers();
+				continue;
+			}
+
+			e.tick(delta);
+		}
+
 		if(sortOutdated) sortEntities();
 	}
 
@@ -67,6 +82,11 @@ public class EntityManager {
 			if (e.getCoord().equals(coord))
 				return e;
 		return null;
+	}
+
+	/** Retrieves the entire list of active entities */
+	public ArrayList<Entity> getEntityList() {
+		return entities;
 	}
 
 	public void requireSort() {

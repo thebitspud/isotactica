@@ -16,14 +16,14 @@ public class EnemyAI extends Player {
 
 	@Override
 	public void initUnits() {
-
+		spawnUnit(4, 1, Unit.ID.GOBLIN_BRUTE);
+		spawnUnit(6, 7, Unit.ID.GOBLIN_BRUTE);
+		spawnUnit(7, 2, Unit.ID.GOBLIN_BRUTE);
 	}
 
 	@Override
 	public void playTurn() {
-		for (Unit unit: units) {
-			unit.nextTurn();
-		}
+		for (Unit unit: units) unit.nextTurn();
 
 		world.nextPlayer();
 	}

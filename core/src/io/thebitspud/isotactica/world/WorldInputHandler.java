@@ -97,19 +97,22 @@ public class WorldInputHandler implements InputProcessor {
 			Point coord = world.getMapOverlay().getCoordinateFromPointer(screenX, screenY);
 			Entity hoveredEntity = world.getEntityManager().getEntity(coord);
 
-			// My sincerest apologies to anyone trying to read this
-			if (hoveredEntity != null) {
+			if (selectedEntity == null) selectedEntity = hoveredEntity;
+			else if (hoveredEntity != null) {
 				if (selectedEntity == hoveredEntity) selectedEntity = null;
-				else selectedEntity = hoveredEntity;
-			} else if (selectedEntity != null) {
-				if (selectedEntity instanceof Unit) {
+				else if (selectedEntity instanceof Unit) {
 					Unit selectedUnit = (Unit) selectedEntity;
-					if (selectedUnit.canMoveToTile(coord)) {
-						selectedUnit.move(coord);
-						if (!selectedUnit.actionAvailable()) selectedEntity = null;
-					} else selectedEntity = null;
+					if (selectedUnit.getPlayer() == world.getUser() && selectedUnit.canAttackEntity(hoveredEntity))
+						selectedUnit.attack(hoveredEntity);
+					else selectedEntity = hoveredEntity;
+				} else selectedEntity = hoveredEntity;
+			} else if (selectedEntity instanceof Unit) {
+				Unit selectedUnit = (Unit) selectedEntity;
+				if (selectedUnit.getPlayer() == world.getUser() && selectedUnit.canMoveToTile(coord)) {
+					selectedUnit.move(coord);
+					if (!selectedUnit.actionAvailable()) selectedEntity = null;
 				} else selectedEntity = null;
-			}
+			} else selectedEntity = null;
 
 			return leftDown = true;
 		}

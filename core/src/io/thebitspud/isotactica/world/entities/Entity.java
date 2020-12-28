@@ -45,6 +45,9 @@ public abstract class Entity extends Sprite {
 
 	public abstract String getInfo();
 
+	/** Increments or decrements the entity's health by the specified value */
+	public abstract void adjustHealth(int value);
+
 	public Point getCoord() {
 		return coord;
 	}

@@ -43,7 +43,7 @@ public class World {
 		mapCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		mapOverlay = new IsometricMapOverlay(game, this);
 		input = new WorldInputHandler(game, this);
-		entityManager = new EntityManager(game);
+		entityManager = new EntityManager(game, this);
 
 		players = new ArrayList<>();
 	}
@@ -77,8 +77,12 @@ public class World {
 	public void tick(float delta) {
 		input.tick(delta);
 		mapCamera.update();
-		for (Player p: players) p.update();
 		entityManager.tick(delta);
+	}
+
+	public void updatePlayers() {
+		for (Player p: players) p.update();
+		players.get(currentPlayerIndex).assessActions();
 	}
 
 	public void render() {
@@ -112,6 +116,7 @@ public class World {
 			updateTurnInfo();
 		}
 
+		Gdx.app.log("Turn " + gameTurn, players.get(currentPlayerIndex).getPlayerInfo());
 		players.get(currentPlayerIndex).playTurn();
 	}
 

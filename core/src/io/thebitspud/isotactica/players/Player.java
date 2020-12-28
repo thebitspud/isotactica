@@ -30,10 +30,7 @@ public abstract class Player {
 	public void update() {
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
-			if (!unit.isActive()) {
-				units.remove(unit);
-				entityManager.removeEntity(unit);
-			}
+			if (!unit.isActive()) units.remove(unit);
 		}
 	}
 
@@ -70,7 +67,10 @@ public abstract class Player {
 
 	/** Iterates through the player's owned units to determine the actions available to them. */
 	public void assessActions() {
-		for (Unit u: units) u.findMoves();
+		for (Unit u: units) {
+			u.findMoves();
+			u.findTargets();
+		}
 	}
 
 	public abstract void initUnits();

@@ -162,6 +162,12 @@ public class AssetHandler extends AssetManager {
 		return style;
 	}
 
+	/* Getters and Setters */
+
+	public String getLastLevel() {
+		return lastLevel;
+	}
+
 	public ShapeDrawer getDrawer() {
 		return drawer;
 	}
