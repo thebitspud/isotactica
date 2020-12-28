@@ -4,7 +4,15 @@ import io.thebitspud.isotactica.Isotactica;
 
 import java.awt.*;
 
+/**
+ * Any non-controllable environmental object
+ */
+
 public class MapObject extends Entity {
+	/**
+	 * An enum of all map objects and their stats
+	 * This will be replaced with a more dynamic system in the future
+	 */
 	public enum ID {
 		ROCK (10),
 		CRACKED_ROCK (5);
@@ -26,13 +34,15 @@ public class MapObject extends Entity {
 		super(coord, game.getAssets().mapObjects[id.ordinal()], game);
 
 		this.id = id;
+		currentHealth = id.maxHealth;
 	}
 
 	/* Getters and Setters */
 
 	@Override
 	public String getInfo() {
-		return "MapObject." + id;
+		String healthText = (id.maxHealth > 0) ? "\nHP: " + currentHealth + "/" + id.maxHealth : "";
+		return "MapObject." + id + healthText;
 	}
 
 	public ID getID() {

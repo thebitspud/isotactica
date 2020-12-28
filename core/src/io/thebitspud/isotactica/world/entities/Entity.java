@@ -14,8 +14,10 @@ import java.awt.Point;
 public abstract class Entity extends Sprite {
 	protected Isotactica game;
 	protected World world;
-	protected Point coord;
+	protected EntityManager entityManager;
 
+	protected Point coord;
+	protected int currentHealth;
 	protected boolean active;
 
 	public Entity(Point coord, TextureRegion texture, Isotactica game) {
@@ -24,6 +26,7 @@ public abstract class Entity extends Sprite {
 		this.coord = coord;
 
 		world = game.getWorld();
+		entityManager = world.getEntityManager();
 		active = true;
 	}
 
@@ -38,15 +41,12 @@ public abstract class Entity extends Sprite {
 		draw(game.getBatch());
 	}
 
+	/* Getters and Setters */
+
 	public abstract String getInfo();
 
 	public Point getCoord() {
 		return coord;
-	}
-
-	/** The z-index of the entity */
-	public int getZIndex() {
-		return coord.x + coord.y;
 	}
 
 	public boolean isActive() {

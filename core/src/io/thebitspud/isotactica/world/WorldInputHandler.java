@@ -102,8 +102,8 @@ public class WorldInputHandler implements InputProcessor {
 				if (selectedEntity == hoveredEntity) selectedEntity = null;
 				else selectedEntity = hoveredEntity;
 			} else if (selectedEntity != null) {
-				if (selectedEntity.getClass() == Unit.class) {
-					Unit selectedUnit = ((Unit) selectedEntity);
+				if (selectedEntity instanceof Unit) {
+					Unit selectedUnit = (Unit) selectedEntity;
 					if (selectedUnit.canMoveToTile(coord)) {
 						selectedUnit.move(coord);
 						if (!selectedUnit.actionAvailable()) selectedEntity = null;

@@ -8,7 +8,15 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 import java.awt.*;
 import java.util.HashMap;
 
+/**
+ * Any controllable unit that can move and act as directed by a player
+ */
+
 public class Unit extends Entity {
+	/**
+	 * An enum of all game units and their stats
+	 * This will be replaced with a more dynamic system in the future
+	 */
 	public enum ID {
 		WARRIOR (10, 2);
 
@@ -31,7 +39,6 @@ public class Unit extends Entity {
 	private ID id;
 	private Player player;
 
-	private int currentHealth;
 	private boolean canMove, canAct;
 	private HashMap<Point, Integer> moves;
 
@@ -97,6 +104,7 @@ public class Unit extends Entity {
 		canMove = false;
 		canAct = false;
 		this.coord = coord;
+		entityManager.requireSort();
 		player.assessActions();
 	}
 
@@ -133,8 +141,6 @@ public class Unit extends Entity {
 		canAct = false;
 	}
 
-	/* Getters and Setters */
-
 	/** Increments or decrements the unit's health by the specified value */
 	public void adjustHealth(int value) {
 		currentHealth += value;
@@ -146,6 +152,7 @@ public class Unit extends Entity {
 		}
 	}
 
+	/* Getters and Setters */
 
 	@Override
 	public String getInfo() {

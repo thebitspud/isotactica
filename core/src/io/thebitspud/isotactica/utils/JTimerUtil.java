@@ -26,6 +26,7 @@ public abstract class JTimerUtil implements Activatable {
 	/**
 	 * A JTimerUtil which counts endlessly and never activates
 	 * Can be used as a stopwatch
+	 * @param active whether the timer automatically begins counting
 	 */
 
 	protected JTimerUtil(boolean active) {

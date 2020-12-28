@@ -57,7 +57,7 @@ public class IsometricMapOverlay {
 		if (selectedEntity != null) {
 			int index = 3;
 
-			if (selectedEntity.getClass() == Unit.class) {
+			if (selectedEntity instanceof Unit) {
 				Unit selectedUnit = (Unit) selectedEntity;
 				if (selectedUnit.getPlayer().equals(world.getUser())) {
 					if (selectedUnit.actionAvailable()) {

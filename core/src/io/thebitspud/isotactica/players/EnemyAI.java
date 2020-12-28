@@ -12,6 +12,8 @@ public class EnemyAI extends Player {
 		super(game);
 	}
 
+	/* Inherited Functions */
+
 	@Override
 	public void initUnits() {
 
