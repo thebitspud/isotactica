@@ -1,5 +1,6 @@
 package io.thebitspud.isotactica.world.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.thebitspud.isotactica.Isotactica;
@@ -44,13 +45,10 @@ public abstract class Entity extends Sprite {
 	/* Getters and Setters */
 
 	public abstract String getInfo();
+	public abstract String getID();
 
 	/** Increments or decrements the entity's health by the specified value */
 	public abstract void adjustHealth(int value);
-
-	public Point getCoord() {
-		return coord;
-	}
 
 	public boolean isActive() {
 		return active;

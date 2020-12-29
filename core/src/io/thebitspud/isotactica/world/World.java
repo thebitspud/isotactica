@@ -80,11 +80,6 @@ public class World {
 		entityManager.tick(delta);
 	}
 
-	public void updatePlayers() {
-		for (Player p: players) p.update();
-		players.get(currentPlayerIndex).assessActions();
-	}
-
 	public void render() {
 		mapRenderer.setView(mapCamera);
 		mapRenderer.render();
@@ -99,7 +94,12 @@ public class World {
 		map.dispose();
 	}
 
-	/* Turn Management Functions */
+	/* Game/Turn Management Functions */
+
+	/** Ends the game as a user victory or defeat */
+	public void endGame(boolean victory) {
+		game.setScreen(victory ? Isotactica.ScreenKey.WIN : Isotactica.ScreenKey.LOSS);
+	}
 
 	/**
 	 * Ends the current player's turn and starts the next player's turn.
@@ -120,6 +120,12 @@ public class World {
 		players.get(currentPlayerIndex).playTurn();
 	}
 
+	/** Updates entity lists and checks available unit actions */
+	public void updatePlayers() {
+		for (Player p: players) p.update();
+		players.get(currentPlayerIndex).assessActions();
+	}
+
 	/** Updates the info that players see */
 	public void updateTurnInfo() {
 		GameScreen gameScreen = (GameScreen) game.getScreen(Isotactica.ScreenKey.GAME);
@@ -132,7 +138,7 @@ public class World {
 
 	/** Retrieves the ground tile (if any) corresponding to the given coordinates */
 	public TiledMapTile getTile(Point coord) {
-		// Note: x and y must be switched for some reason
+		// Note: x and y are swapped
 		int adjX = MathUtils.clamp(coord.y, 0, height - 1);
 		int adjY = width - MathUtils.clamp(coord.x, 0, width - 1) - 1;
 

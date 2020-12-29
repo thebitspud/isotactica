@@ -50,6 +50,7 @@ public class GameScreen extends JScreenTemplate {
 	@Override
 	public void render(float delta) {
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) game.setScreen(Isotactica.ScreenKey.PAUSE);
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) world.nextPlayer();
 
 		stage.act();
 		world.tick(delta);

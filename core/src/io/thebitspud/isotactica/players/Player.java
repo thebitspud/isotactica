@@ -32,6 +32,8 @@ public abstract class Player {
 			Unit unit = units.get(i);
 			if (!unit.isActive()) units.remove(unit);
 		}
+
+		if (units.isEmpty()) world.endGame(this instanceof EnemyAI);
 	}
 
 	/**

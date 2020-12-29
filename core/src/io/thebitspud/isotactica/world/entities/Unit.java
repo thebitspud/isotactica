@@ -72,8 +72,8 @@ public class Unit extends Entity {
 
 		nextTurn();
 
-		final String coordText = " at [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Unit spawned", "ID." + id + coordText);
+		String coordText = " at [" + coord.x + ", " + coord.y + "]";
+		Gdx.app.log("Entity spawned", getID() + coordText);
 	}
 
 	/** Resets the unit's movement and action tokens and begins its next turn */
@@ -138,9 +138,9 @@ public class Unit extends Entity {
 	public void move(Point coord) {
 		if (!canMoveToTile(coord)) return;
 
-		final String lastCoordText = " from [" + this.coord.x + ", " + this.coord.y + "]";
-		final String newCoordText = " to [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Unit moved", "ID." + id + lastCoordText + newCoordText);
+		String lastCoordText = " moved from [" + this.coord.x + ", " + this.coord.y + "]";
+		String newCoordText = " to [" + coord.x + ", " + coord.y + "]";
+		Gdx.app.log("Action", getID() + lastCoordText + newCoordText);
 
 		canMove = false;
 		this.coord = coord;
@@ -186,7 +186,10 @@ public class Unit extends Entity {
 	public void attack(Entity e) {
 		if (!canAttackEntity(e)) return;
 
-		Gdx.app.log("Unit attacked", "ID." + id);
+		String coordText = " [" + coord.x + ", " + coord.y + "]";
+		String targetCoordText = " [" + e.coord.x + ", " + e.coord.y + "]";
+		String attackText = getID() + coordText + " attacked " + e.getID() + targetCoordText;
+		Gdx.app.log("Action",  attackText);
 
 		canMove = false;
 		canAct = false;
@@ -210,8 +213,8 @@ public class Unit extends Entity {
 			if (!e.isActive()) continue;
 			if (e instanceof Unit && player == ((Unit) e).getPlayer()) continue;
 
-			int diffX = Math.abs(coord.x - e.getCoord().x);
-			int diffY = Math.abs(coord.y - e.getCoord().y);
+			int diffX = Math.abs(coord.x - e.coord.x);
+			int diffY = Math.abs(coord.y - e.coord.y);
 
 			if (diffX + diffY <= id.range) targets.add(e);
 		}
@@ -234,7 +237,12 @@ public class Unit extends Entity {
 	public String getInfo() {
 		String healthText = "\nHP: " + currentHealth + "/" + id.maxHealth;
 		String statsText = "\nAgility: " + id.agility;
-		return "Unit." + id + healthText + statsText;
+		return getID() + healthText + statsText;
+	}
+
+	@Override
+	public String getID() {
+		return "Unit." + id;
 	}
 
 	public Player getPlayer() {

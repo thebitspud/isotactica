@@ -79,7 +79,7 @@ public class EntityManager {
 	/** Retrieves the entity (if any) at the specified coordinate */
 	public Entity getEntity(Point coord) {
 		for (Entity e: entities)
-			if (e.getCoord().equals(coord))
+			if (e.coord.equals(coord))
 				return e;
 		return null;
 	}

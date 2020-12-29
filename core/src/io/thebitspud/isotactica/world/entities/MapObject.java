@@ -42,8 +42,8 @@ public class MapObject extends Entity {
 		if (id == ID.CRACKED_ROCK) currentHealth = id.maxHealth / 2;
 		else currentHealth = id.maxHealth;
 
-		final String coordText = " at [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("MapObject spawned", "ID." + id + coordText);
+		String coordText = " at [" + coord.x + ", " + coord.y + "]";
+		Gdx.app.log("Entity spawned", getID() + coordText);
 	}
 
 	@Override
@@ -85,6 +85,11 @@ public class MapObject extends Entity {
 	@Override
 	public String getInfo() {
 		String healthText = (id.maxHealth > 0) ? "\nHP: " + currentHealth + "/" + id.maxHealth : "";
-		return "MapObject." + id + healthText;
+		return getID() + healthText;
+	}
+
+	@Override
+	public String getID() {
+		return "MapObject." + id;
 	}
 }

@@ -17,7 +17,7 @@ import java.util.EnumMap;
 public class Isotactica extends Game {
 	/** An enum of all accessible screens */
 	public enum ScreenKey {
-		TITLE, GAME, PAUSE
+		TITLE, GAME, PAUSE, WIN, LOSS
 	}
 
 	public final int TILE_WIDTH = 64;
@@ -43,6 +43,8 @@ public class Isotactica extends Game {
 		screens.put(ScreenKey.TITLE, new TitleScreen(this));
 		screens.put(ScreenKey.GAME, new GameScreen(this));
 		screens.put(ScreenKey.PAUSE, new PauseScreen(this));
+		screens.put(ScreenKey.WIN, new WinScreen(this));
+		screens.put(ScreenKey.LOSS, new LossScreen(this));
 		
 		setScreen(ScreenKey.TITLE);
 	}
