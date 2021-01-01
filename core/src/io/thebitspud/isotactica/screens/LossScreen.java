@@ -22,13 +22,14 @@ public class LossScreen extends JScreenTemplate {
 			@Override
 			public void onActivation() {
 				game.setScreen(Isotactica.ScreenKey.GAME);
-				game.getWorld().load("isotest");;
+				game.getWorld().load("isotest");
 			}
 		});
 		addImageButton(5, Align.center, width * 0.5f, height * 0.3f, new JInputListener() {
 			@Override
 			public void onActivation() {
 				game.setScreen(Isotactica.ScreenKey.TITLE);
+				game.getWorld().load("isotest");
 			}
 		});
 	}

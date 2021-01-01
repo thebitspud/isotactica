@@ -6,7 +6,6 @@ import io.thebitspud.isotactica.world.entities.Entity;
 import io.thebitspud.isotactica.world.entities.Unit;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -40,7 +39,9 @@ public class EnemyAI extends Player {
 		for (Unit unit: units) {
 			unit.nextTurn();
 
-			Entity target = findNearestTarget(unit);
+			Entity target = findNearestTarget(unit, 16);
+			moveTowards(unit, target);
+			unit.attack(target);
 		}
 
 		world.nextPlayer();
@@ -51,21 +52,22 @@ public class EnemyAI extends Player {
 	 * The integer value indicates the number of steps to a location
 	 */
 	private HashMap<Point, Integer> moves;
+	private int totalSteps;
 	private Entity nearestEnemy;
 
 	/**
-	 * Finds the enemy target closes to a given unit
-	 * @param attacker the attacking unit
+	 * Finds the enemy target closest to a given unit
+	 * @param unit the attacking unit
 	 */
-
-	public Entity findNearestTarget(Unit attacker) {
+	public Entity findNearestTarget(Unit unit, int searchRange) {
 		moves.clear();
 		nearestEnemy = null;
+		totalSteps = 0;
 
-		checkAdjacentCoords(attacker.getCoord(), 0);
+		checkAdjacentCoords(unit.getCoord(), 0);
 		if (nearestEnemy != null) return nearestEnemy;
 
-		for (int i = 1; i < 16; i++) {
+		for (int i = 1; i < searchRange; i++) {
 			for (int j = 0; j < moves.size(); j++) {
 				if ((int) moves.values().toArray()[j] != i) continue;
 				checkAdjacentCoords((Point) moves.keySet().toArray()[j], i);
@@ -78,10 +80,9 @@ public class EnemyAI extends Player {
 
 	/**
 	 * Checks for entities in all adjacent tiles connected to a given coord
-	 * @param coord the origin coord (tiles around this one are checked)
-	 * @param steps the number of steps to the originating position
+	 * @param coord the origin coordinate (tiles around this one are checked)
+	 * @param steps the number of moves to the originating position
 	 */
-
 	private void checkAdjacentCoords(Point coord, int steps) {
 		checkCoord(new Point(coord.x + 1, coord.y), steps + 1);
 		checkCoord(new Point(coord.x - 1, coord.y), steps + 1);
@@ -92,9 +93,8 @@ public class EnemyAI extends Player {
 	/**
 	 * Checks for the presence of an enemy at a given position
 	 * @param coord the position being checked
-	 * @param steps the number of steps to the position
+	 * @param steps the number of moves from a certain unit to the position
 	 */
-
 	private void checkCoord(Point coord, int steps) {
 		if (moves.containsKey(coord)) return;
 		if (!tileAvailable(coord) && steps > 0) {
@@ -107,14 +107,40 @@ public class EnemyAI extends Player {
 
 			nearestEnemy = e;
 
-			String coordText = steps + " steps from [" + coord.x + "," + coord.y + "]";
-			Gdx.app.log("Target Acquired", coordText);
+			String unitText = (totalSteps = steps) + " steps from " + e.getID();
+			String coordText = " [" + coord.x + "," + coord.y + "]";
+			Gdx.app.log("Target Acquired", unitText + coordText);
 
 			return;
 		}
 
 		moves.put(coord, steps);
 	}
+
+	/** Attempts to move the selected unit closer to the target location */
+	private void moveTowards(Unit unit, Entity target) {
+		if (target == null) return;
+		Point nextCoord = new Point(target.getCoord());
+
+		while (unit.moveAvailable()) {
+			if (totalSteps == 0) break;
+
+			Point west = new Point(nextCoord.x + 1, nextCoord.y);
+			Point east = new Point(nextCoord.x - 1, nextCoord.y);
+			Point south = new Point(nextCoord.x, nextCoord.y + 1);
+			Point north = new Point(nextCoord.x, nextCoord.y - 1);
+
+			if (moves.get(west) != null && moves.get(west) <= totalSteps) nextCoord = west;
+			else if (moves.get(east) != null && moves.get(east) <= totalSteps) nextCoord = east;
+			else if (moves.get(south) != null && moves.get(south) <= totalSteps) nextCoord = south;
+			else if (moves.get(north) != null && moves.get(north) <= totalSteps) nextCoord = north;
+
+			totalSteps -= 1;
+			unit.move(nextCoord);
+		}
+	}
+
+	/** Getters and Setters */
 
 	@Override
 	public String getPlayerInfo() {

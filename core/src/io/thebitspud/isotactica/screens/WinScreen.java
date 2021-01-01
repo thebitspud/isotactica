@@ -29,6 +29,7 @@ public class WinScreen extends JScreenTemplate {
 			@Override
 			public void onActivation() {
 				game.setScreen(Isotactica.ScreenKey.TITLE);
+				game.getWorld().load("isotest");
 			}
 		});
 	}
