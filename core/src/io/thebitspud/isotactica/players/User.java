@@ -14,9 +14,14 @@ public class User extends Player {
 
 	@Override
 	public void initUnits() {
-		spawnUnit(2, 3, Unit.ID.WARRIOR);
-		spawnUnit(6, 4, Unit.ID.WARRIOR);
-		spawnUnit(3, 7, Unit.ID.WARRIOR);
+		switch (game.getAssets().getLastLevel()) {
+			case "isotest":
+				spawnUnit(2, 3, Unit.ID.WARRIOR);
+				spawnUnit(6, 4, Unit.ID.WARRIOR);
+				spawnUnit(3, 7, Unit.ID.WARRIOR);
+				break;
+			default: break;
+		}
 	}
 
 	@Override

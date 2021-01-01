@@ -54,6 +54,10 @@ public abstract class Entity extends Sprite {
 		return active;
 	}
 
+	public Point getCoord() {
+		return coord;
+	}
+
 	public void setActive(boolean active) {
 		this.active = active;
 	}
