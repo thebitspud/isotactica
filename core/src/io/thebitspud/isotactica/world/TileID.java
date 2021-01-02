@@ -37,14 +37,9 @@ public enum TileID {
 		return profile == MovementProfile.NONE;
 	}
 
-	/** Get the index of the TileID which this function was called from */
-	public int getIndex() {
-		return this.ordinal();
-	}
-
 	/** Generates a formatted string containing relevant tile info */
 	public String getTileInfo() {
-		String idText = "\nID: " + getIndex() + " (Tile." + this + ")";
+		String idText = "\nID: " + this.ordinal() + " (Tile." + this + ")";
 		String propertiesText = "\nMovement: " + this.profile;
 
 		return idText + propertiesText;

@@ -47,7 +47,7 @@ public class EnemyAI extends Player {
 			unit.nextTurn();
 
 			// Basic movement and attacking AI
-			Entity target = findNearestTarget(unit, 32);
+			Entity target = findNearestTarget(unit, 16);
 			moveTowards(unit, target);
 			unit.attack(target);
 		}
@@ -104,7 +104,7 @@ public class EnemyAI extends Player {
 
 			currentTarget = e;
 
-			String unitText = (stepsToTarget = steps) + " steps from " + e.getID();
+			String unitText = (stepsToTarget = steps) + " steps from " + e.getIDText();
 			String coordText = " [" + coord.x + "," + coord.y + "]";
 			Gdx.app.log("Target Acquired", unitText + coordText);
 
@@ -119,22 +119,15 @@ public class EnemyAI extends Player {
 		if (target == null) return;
 		Point nextCoord = new Point(target.getCoord());
 
-		while (unit.moveAvailable()) {
-			if (stepsToTarget == 0) break;
+		moves.put(nextCoord, stepsToTarget);
+		moves.forEach((key, value) -> moves.replace(key, stepsToTarget - value));
 
-			Point west = new Point(nextCoord.x + 1, nextCoord.y);
-			Point east = new Point(nextCoord.x - 1, nextCoord.y);
-			Point south = new Point(nextCoord.x, nextCoord.y + 1);
-			Point north = new Point(nextCoord.x, nextCoord.y - 1);
-
-			// Checking for the next possible move from the target
-			if (moves.get(west) != null && moves.get(west) <= stepsToTarget) nextCoord = west;
-			else if (moves.get(east) != null && moves.get(east) <= stepsToTarget) nextCoord = east;
-			else if (moves.get(south) != null && moves.get(south) <= stepsToTarget) nextCoord = south;
-			else if (moves.get(north) != null && moves.get(north) <= stepsToTarget) nextCoord = north;
-
-			stepsToTarget -= 1;
-			unit.move(nextCoord);
+		for (int i = 0; i < stepsToTarget; i++) {
+			nextCoord = unit.findNextStep(nextCoord, moves);
+			if (unit.canMoveToTile(nextCoord)) {
+				unit.move(nextCoord);
+				break;
+			}
 		}
 	}
 

@@ -155,7 +155,7 @@ public class World {
 
 		TiledMapTileLayer.Cell cell = groundLayer.getCell(adjX, adjY);
 		if (cell == null) groundLayer.setCell(adjX, adjY, cell = new TiledMapTileLayer.Cell());
-		cell.setTile(map.getTileSets().getTile(id.getIndex() == 6 ? 7 : id.getIndex()));
+		cell.setTile(map.getTileSets().getTile(id.ordinal() == 6 ? 7 : id.ordinal()));
 	}
 
 	/** Retrieves the TileID corresponding to the given tile */

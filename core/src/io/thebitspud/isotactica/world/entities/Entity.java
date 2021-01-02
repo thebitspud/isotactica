@@ -1,10 +1,12 @@
 package io.thebitspud.isotactica.world.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.utils.JTimerUtil;
 import io.thebitspud.isotactica.world.World;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.awt.Point;
 
@@ -19,7 +21,7 @@ public abstract class Entity extends Sprite {
 
 	protected JTimerUtil moveTween;
 	protected Point coord, lastCoord;
-	protected int currentHealth;
+	protected int currentHealth, maxHealth;
 	protected boolean active;
 
 	public Entity(Point coord, TextureRegion texture, Isotactica game) {
@@ -33,7 +35,7 @@ public abstract class Entity extends Sprite {
 		active = true;
 		setOrigin(0, 0);
 
-		moveTween = new JTimerUtil(0.5f, false, false) {
+		moveTween = new JTimerUtil(0.4f, false, false) {
 			@Override
 			public void onActivation() {
 
@@ -64,15 +66,38 @@ public abstract class Entity extends Sprite {
 
 	public void render() {
 		draw(game.getBatch());
+		drawHealthBar();
+	}
+
+	/** Draws a dynamic health bar above the unit. */
+	protected void drawHealthBar() {
+		float healthPercent = (float) currentHealth / maxHealth * 100;
+		float width = getWidth() * getScaleX();
+		float height = 2 * getScaleY();
+		float xPos = getX() + width / 4;
+		float yPos = getY() + (getHeight() - 10) * getScaleY();
+
+		ShapeDrawer drawer = game.getAssets().getDrawer();
+		drawer.filledRectangle(xPos, yPos, width / 2, height, Color.BLACK);
+		drawer.setColor((100 - healthPercent) / 100f, healthPercent / 100f, 0, 1);
+		drawer.filledRectangle(xPos, yPos, width * healthPercent / 200,  height);
 	}
 
 	/* Getters and Setters */
 
-	public abstract String getInfo();
-	public abstract String getID();
-
 	/** Increments or decrements the entity's health by the specified value */
-	public abstract void adjustHealth(int value);
+	public void adjustHealth(int value) {
+		currentHealth += value;
+
+		if (currentHealth > maxHealth) currentHealth = maxHealth;
+		else if (currentHealth <= 0) {
+			currentHealth = 0;
+			active = false;
+		}
+	}
+
+	public abstract String getInfo();
+	public abstract String getIDText();
 
 	public boolean isActive() {
 		return active;
@@ -84,5 +109,13 @@ public abstract class Entity extends Sprite {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public int getCurrentHealth() {
+		return currentHealth;
+	}
+
+	public int getMaxHealth() {
+		return maxHealth;
 	}
 }

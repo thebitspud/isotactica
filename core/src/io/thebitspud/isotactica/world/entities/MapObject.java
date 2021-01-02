@@ -1,9 +1,7 @@
 package io.thebitspud.isotactica.world.entities;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import io.thebitspud.isotactica.Isotactica;
-import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.awt.*;
 
@@ -26,10 +24,6 @@ public class MapObject extends Entity {
 		ID(int maxHealth) {
 			this.maxHealth = maxHealth;
 		}
-
-		public int getMaxHealth() {
-			return maxHealth;
-		}
 	}
 
 	private ID id;
@@ -41,42 +35,19 @@ public class MapObject extends Entity {
 
 		if (id == ID.CRACKED_ROCK) currentHealth = id.maxHealth / 2;
 		else currentHealth = id.maxHealth;
+		maxHealth = id.maxHealth;
 
 		String coordText = " at [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Entity spawned", getID() + coordText);
-	}
-
-	@Override
-	public void render() {
-		super.render();
-		drawHealthBar();
-	}
-
-	/** Draws a dynamic health bar above the unit. */
-	private void drawHealthBar() {
-		float healthPercent = (float) currentHealth / id.maxHealth * 100;
-		float width = getWidth() * getScaleX();
-		float height = 2 * getScaleY();
-		float xPos = getX() + width / 4;
-		float yPos = getY() + (getHeight() - 25) * getScaleY();
-
-		ShapeDrawer drawer = game.getAssets().getDrawer();
-		drawer.filledRectangle(xPos, yPos, width / 2, height, Color.BLACK);
-		drawer.setColor((100 - healthPercent) / 100f, healthPercent / 100f, 0, 1);
-		drawer.filledRectangle(xPos, yPos, width * healthPercent / 200,  height);
+		Gdx.app.log("Entity spawned", getIDText() + coordText);
 	}
 
 	/* Getters and Setters */
 
 	@Override
 	public void adjustHealth(int value) {
-		currentHealth += value;
+		super.adjustHealth(value);
 
-		if (currentHealth > id.maxHealth) currentHealth = id.maxHealth;
-		else if (currentHealth <= 0) {
-			currentHealth = 0;
-			active = false;
-		} else if (id == ID.ROCK && currentHealth <= 5) {
+		if (currentHealth <= 5 && id == ID.ROCK) {
 			id = ID.CRACKED_ROCK;
 			setRegion(game.getAssets().mapObjects[id.ordinal()]);
 		}
@@ -85,11 +56,11 @@ public class MapObject extends Entity {
 	@Override
 	public String getInfo() {
 		String healthText = (id.maxHealth > 0) ? "\nHP: " + currentHealth + "/" + id.maxHealth : "";
-		return getID() + healthText;
+		return getIDText() + healthText;
 	}
 
 	@Override
-	public String getID() {
+	public String getIDText() {
 		return "MapObject." + id;
 	}
 }

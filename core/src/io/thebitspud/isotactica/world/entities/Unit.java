@@ -1,10 +1,8 @@
 package io.thebitspud.isotactica.world.entities;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.players.Player;
-import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,29 +21,13 @@ public class Unit extends Entity {
 		WARRIOR (10, 2, 1, 2),
 		GOBLIN_BRUTE (15, 2, 1, 1);
 
-		private final int maxHealth, agility, range, attack;
+		public final int maxHealth, agility, range, attack;
 
 		ID(int maxHealth, int agility, int range, int attack) {
 			this.maxHealth = maxHealth;
 			this.agility = agility;
 			this.range = range;
 			this.attack = attack;
-		}
-
-		public int getMaxHealth() {
-			return maxHealth;
-		}
-
-		public int getAgility() {
-			return agility;
-		}
-
-		public int getRange() {
-			return range;
-		}
-
-		public int getAttack() {
-			return attack;
 		}
 	}
 
@@ -61,7 +43,8 @@ public class Unit extends Entity {
 	private HashMap<Point, Integer> moves;
 	/** A list of entities this unit can attack */
 	private ArrayList<Entity> targets;
-	private ArrayList<Point> steps;
+	/** The list of coords travelled along when this unit move */
+	private ArrayList<Point> tweenPath;
 
 	public Unit(Point coord, ID id, Player player, Isotactica game) {
 		super(coord, game.getAssets().units[id.ordinal()], game);
@@ -69,14 +52,16 @@ public class Unit extends Entity {
 		this.id = id;
 		this.player = player;
 		currentHealth = id.maxHealth;
+		maxHealth = id.maxHealth;
+
 		moves = new HashMap<>();
 		targets = new ArrayList<>();
-		steps = new ArrayList<>();
+		tweenPath = new ArrayList<>();
 
 		nextTurn();
 
 		String coordText = " at [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Entity spawned", getID() + coordText);
+		Gdx.app.log("Entity spawned", getIDText() + coordText);
 	}
 
 	/** Resets the unit's movement and action tokens and begins its next turn */
@@ -90,12 +75,12 @@ public class Unit extends Entity {
 
 	@Override
 	public void tick(float delta) {
-		if (currentStep < steps.size() - 1 && !moveTween.isActive()) {
+		if (currentStep < tweenPath.size() - 1 && !moveTween.isActive()) {
 			moveTween.setTimeElapsed(0);
 			moveTween.setActive(true);
 
-			lastCoord = steps.get(currentStep);
-			coord = steps.get(currentStep + 1);
+			lastCoord = tweenPath.get(currentStep);
+			coord = tweenPath.get(currentStep + 1);
 
 			currentStep++;
 		}
@@ -110,20 +95,6 @@ public class Unit extends Entity {
 		super.render();
 		drawHealthBar();
 		drawActionIndicator();
-	}
-
-	/** Draws a dynamic health bar above the unit. */
-	private void drawHealthBar() {
-		float healthPercent = (float) currentHealth / id.maxHealth * 100;
-		float width = getWidth() * getScaleX();
-		float height = 2 * getScaleY();
-		float xPos = getX() + width / 4;
-		float yPos = getY() + (getHeight() - 10) * getScaleY();
-
-		ShapeDrawer drawer = game.getAssets().getDrawer();
-		drawer.filledRectangle(xPos, yPos, width / 2, height, Color.BLACK);
-		drawer.setColor((100 - healthPercent) / 100f, healthPercent / 100f, 0, 1);
-		drawer.filledRectangle(xPos, yPos, width * healthPercent / 200,  height);
 	}
 
 	/** Draws an indicator above a user unit to indicate an action is available. */
@@ -160,47 +131,59 @@ public class Unit extends Entity {
 		lastCoord = this.coord;
 		this.coord = coord;
 
-		steps.clear();
+		tweenPath.clear();
 		currentStep = 0;
-		findSteps();
+		findPath();
 
 		entityManager.requireSort();
 		player.assessActions();
 
 		String lastCoordText = " moved from [" + lastCoord.x + ", " + lastCoord.y + "]";
 		String newCoordText = " to [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Action", getID() + lastCoordText + newCoordText);
+		Gdx.app.log("Action", getIDText() + lastCoordText + newCoordText);
 	}
 
-	private void findSteps() {
-		Point nextCoord = new Point(coord);
+	/** Determines the path of the unit when moving */
+	private void findPath() {
 		int totalSteps = id.agility - moves.get(coord);
+		Point nextCoord = new Point(coord);
 
 		for (int i = 0; i < totalSteps; i++) {
-			Point west = new Point(nextCoord.x + 1, nextCoord.y);
-			Point east = new Point(nextCoord.x - 1, nextCoord.y);
-			Point south = new Point(nextCoord.x, nextCoord.y + 1);
-			Point north = new Point(nextCoord.x, nextCoord.y - 1);
-
-			// Checking for the next possible move segment
-			if (isNextMove(nextCoord, west)) nextCoord = west;
-			else if (isNextMove(nextCoord, east)) nextCoord = east;
-			else if (isNextMove(nextCoord, south)) nextCoord = south;
-			else if (isNextMove(nextCoord, north)) nextCoord = north;
-
-			steps.add(0, nextCoord);
+			nextCoord = findNextStep(nextCoord, moves);
+			tweenPath.add(0, nextCoord);
 		}
 
-		steps.add(coord);
+		tweenPath.add(coord);
 
-		String stepText = steps.toString().replaceAll("java.awt.Point", "");
-		stepText = stepText.replaceAll("x=", "");
-		stepText = stepText.replaceAll("y=", "");
-		Gdx.app.log("Path found", stepText);
+		String pathText = tweenPath.toString().replaceAll("java.awt.Point", "");
+		pathText = pathText.replaceAll("x=", "");
+		pathText = pathText.replaceAll("y=", "");
+		Gdx.app.log("Path found", pathText);
 	}
 
-	private boolean isNextMove(Point from, Point to) {
-		return moves.get(to) != null && moves.get(to) > moves.get(from);
+	/**
+	 * Determines the subsequent step in a unit's path
+	 * @param from the previous step in the path
+	 * @param moves a curated hashmap of open locations
+	 */
+	public Point findNextStep(Point from, HashMap<Point, Integer> moves) {
+		Point west = new Point(from.x + 1, from.y);
+		Point east = new Point(from.x - 1, from.y);
+		Point south = new Point(from.x, from.y + 1);
+		Point north = new Point(from.x, from.y - 1);
+
+		if (isNextStep(from, west, moves)) from = west;
+		else if (isNextStep(from, east, moves)) from = east;
+		else if (isNextStep(from, south, moves)) from = south;
+		else if (isNextStep(from, north, moves)) from = north;
+
+		return from;
+	}
+
+	/** Checks the viability of a potential subsequent move */
+	private boolean isNextStep(Point from, Point to, HashMap<Point, Integer> moves) {
+		if (moves.get(to) == null) return false;
+		return moves.get(to) > moves.get(from);
 	}
 
 	/** Checks whether this unit can be moved to the specified grid location */
@@ -209,7 +192,7 @@ public class Unit extends Entity {
 		return moves.containsKey(coord);
 	}
 
-	/** Compiles a list of grid locations this unit can currently move to. */
+	/** Compiles a list of grid locations this unit can currently move to */
 	public void findMoves() {
 		moves.clear();
 		if (!canMove) return;
@@ -242,7 +225,7 @@ public class Unit extends Entity {
 
 		String coordText = " [" + coord.x + ", " + coord.y + "]";
 		String targetCoordText = " [" + e.coord.x + ", " + e.coord.y + "]";
-		String attackText = getID() + coordText + " attacked " + e.getID() + targetCoordText;
+		String attackText = getIDText() + coordText + " attacked " + e.getIDText() + targetCoordText;
 		Gdx.app.log("Action",  attackText);
 
 		canMove = false;
@@ -274,29 +257,22 @@ public class Unit extends Entity {
 		}
 	}
 
-	@Override
-	public void adjustHealth(int value) {
-		currentHealth += value;
-
-		if (currentHealth > id.maxHealth) currentHealth = id.maxHealth;
-		else if (currentHealth <= 0) {
-			currentHealth = 0;
-			active = false;
-		}
-	}
-
 	/* Getters and Setters */
 
 	@Override
 	public String getInfo() {
-		String healthText = "\nHP: " + currentHealth + "/" + id.maxHealth;
+		String healthText = "\nHP: " + currentHealth + "/" + maxHealth;
 		String statsText = "\nAgility: " + id.agility;
-		return getID() + healthText + statsText;
+		return getIDText() + healthText + statsText;
 	}
 
 	@Override
-	public String getID() {
+	public String getIDText() {
 		return "Unit." + id;
+	}
+
+	public ID getID() {
+		return id;
 	}
 
 	public Player getPlayer() {
