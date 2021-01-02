@@ -53,6 +53,7 @@ public class Unit extends Entity {
 	private Player player;
 
 	private boolean canMove, canAct;
+	private int currentStep;
 	/**
 	 * A HashMap of open locations this unit can move to
 	 * The integer value indicates the max number of remaining moves from a location
@@ -60,6 +61,7 @@ public class Unit extends Entity {
 	private HashMap<Point, Integer> moves;
 	/** A list of entities this unit can attack */
 	private ArrayList<Entity> targets;
+	private ArrayList<Point> steps;
 
 	public Unit(Point coord, ID id, Player player, Isotactica game) {
 		super(coord, game.getAssets().units[id.ordinal()], game);
@@ -69,6 +71,7 @@ public class Unit extends Entity {
 		currentHealth = id.maxHealth;
 		moves = new HashMap<>();
 		targets = new ArrayList<>();
+		steps = new ArrayList<>();
 
 		nextTurn();
 
@@ -83,6 +86,21 @@ public class Unit extends Entity {
 
 		findMoves();
 		findTargets();
+	}
+
+	@Override
+	public void tick(float delta) {
+		if (currentStep < steps.size() - 1 && !moveTween.isActive()) {
+			moveTween.setTimeElapsed(0);
+			moveTween.setActive(true);
+
+			lastCoord = steps.get(currentStep);
+			coord = steps.get(currentStep + 1);
+
+			currentStep++;
+		}
+
+		super.tick(delta);
 	}
 
 	/* Widget Rendering */
@@ -138,15 +156,51 @@ public class Unit extends Entity {
 	public void move(Point coord) {
 		if (!canMoveToTile(coord)) return;
 
-		String lastCoordText = " moved from [" + this.coord.x + ", " + this.coord.y + "]";
-		String newCoordText = " to [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Action", getID() + lastCoordText + newCoordText);
-
 		canMove = false;
+		lastCoord = this.coord;
 		this.coord = coord;
+
+		steps.clear();
+		currentStep = 0;
+		findSteps();
 
 		entityManager.requireSort();
 		player.assessActions();
+
+		String lastCoordText = " moved from [" + lastCoord.x + ", " + lastCoord.y + "]";
+		String newCoordText = " to [" + coord.x + ", " + coord.y + "]";
+		Gdx.app.log("Action", getID() + lastCoordText + newCoordText);
+	}
+
+	private void findSteps() {
+		Point nextCoord = new Point(coord);
+		int totalSteps = id.agility - moves.get(coord);
+
+		for (int i = 0; i < totalSteps; i++) {
+			Point west = new Point(nextCoord.x + 1, nextCoord.y);
+			Point east = new Point(nextCoord.x - 1, nextCoord.y);
+			Point south = new Point(nextCoord.x, nextCoord.y + 1);
+			Point north = new Point(nextCoord.x, nextCoord.y - 1);
+
+			// Checking for the next possible move segment
+			if (isNextMove(nextCoord, west)) nextCoord = west;
+			else if (isNextMove(nextCoord, east)) nextCoord = east;
+			else if (isNextMove(nextCoord, south)) nextCoord = south;
+			else if (isNextMove(nextCoord, north)) nextCoord = north;
+
+			steps.add(0, nextCoord);
+		}
+
+		steps.add(coord);
+
+		String stepText = steps.toString().replaceAll("java.awt.Point", "");
+		stepText = stepText.replaceAll("x=", "");
+		stepText = stepText.replaceAll("y=", "");
+		Gdx.app.log("Path found", stepText);
+	}
+
+	private boolean isNextMove(Point from, Point to) {
+		return moves.get(to) != null && moves.get(to) > moves.get(from);
 	}
 
 	/** Checks whether this unit can be moved to the specified grid location */

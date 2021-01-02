@@ -1,9 +1,9 @@
 package io.thebitspud.isotactica.world.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.thebitspud.isotactica.Isotactica;
+import io.thebitspud.isotactica.utils.JTimerUtil;
 import io.thebitspud.isotactica.world.World;
 
 import java.awt.Point;
@@ -17,7 +17,8 @@ public abstract class Entity extends Sprite {
 	protected World world;
 	protected EntityManager entityManager;
 
-	protected Point coord;
+	protected JTimerUtil moveTween;
+	protected Point coord, lastCoord;
 	protected int currentHealth;
 	protected boolean active;
 
@@ -25,16 +26,39 @@ public abstract class Entity extends Sprite {
 		super(texture);
 		this.game = game;
 		this.coord = coord;
+		lastCoord = new Point(coord);
 
 		world = game.getWorld();
 		entityManager = world.getEntityManager();
 		active = true;
+		setOrigin(0, 0);
+
+		moveTween = new JTimerUtil(0.5f, false, false) {
+			@Override
+			public void onActivation() {
+
+			}
+		};
 	}
 
 	public void tick(float delta) {
-		Point renderPosition = world.getMapOverlay().getPointerPosition(coord);
-		setPosition(renderPosition.x, renderPosition.y);
-		setOrigin(0, 0);
+		Point offset = world.getMapOverlay().getPointerPosition(coord);
+		moveTween.tick(delta);
+
+		if (moveTween.isActive()) {
+			// Calculating the render location of the entity during a tween
+			Point lastOffset = world.getMapOverlay().getPointerPosition(lastCoord);
+			float completion = (float) (moveTween.getTimeElapsed() / moveTween.getTimerDuration());
+			float tweenOffsetX = offset.x * completion + lastOffset.x * (1 - completion);
+			float tweenOffsetY = offset.y * completion + lastOffset.y * (1 - completion);
+
+			setPosition(tweenOffsetX, tweenOffsetY);
+		} else {
+			// Calculating the render location of a non-moving entity
+			// This is done once per frame to account for camera movement
+			setPosition(offset.x, offset.y);
+		}
+
 		setScale(1 / world.getMapCamera().zoom);
 	}
 

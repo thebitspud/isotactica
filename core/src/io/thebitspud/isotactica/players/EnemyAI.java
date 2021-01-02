@@ -13,6 +13,14 @@ import java.util.HashMap;
  */
 
 public class EnemyAI extends Player {
+	/**
+	 * A HashMap of locations a given unit can reach
+	 * The integer value indicates the number of steps to a location
+	 */
+	private HashMap<Point, Integer> moves;
+	private Entity currentTarget;
+	private int stepsToTarget;
+
 	public EnemyAI(Isotactica game) {
 		super(game);
 
@@ -35,11 +43,11 @@ public class EnemyAI extends Player {
 
 	@Override
 	public void playTurn() {
-		// Unit AI
 		for (Unit unit: units) {
 			unit.nextTurn();
 
-			Entity target = findNearestTarget(unit, 16);
+			// Basic movement and attacking AI
+			Entity target = findNearestTarget(unit, 32);
 			moveTowards(unit, target);
 			unit.attack(target);
 		}
@@ -47,31 +55,20 @@ public class EnemyAI extends Player {
 		world.nextPlayer();
 	}
 
-	/**
-	 * A HashMap of locations a given unit can reach
-	 * The integer value indicates the number of steps to a location
-	 */
-	private HashMap<Point, Integer> moves;
-	private int totalSteps;
-	private Entity nearestEnemy;
-
-	/**
-	 * Finds the enemy target closest to a given unit
-	 * @param unit the attacking unit
-	 */
+	/** Finds the enemy target closest to a given unit */
 	public Entity findNearestTarget(Unit unit, int searchRange) {
 		moves.clear();
-		nearestEnemy = null;
-		totalSteps = 0;
+		currentTarget = null;
+		stepsToTarget = 0;
 
 		checkAdjacentCoords(unit.getCoord(), 0);
-		if (nearestEnemy != null) return nearestEnemy;
+		if (currentTarget != null) return currentTarget;
 
 		for (int i = 1; i < searchRange; i++) {
 			for (int j = 0; j < moves.size(); j++) {
 				if ((int) moves.values().toArray()[j] != i) continue;
 				checkAdjacentCoords((Point) moves.keySet().toArray()[j], i);
-				if (nearestEnemy != null) return nearestEnemy;
+				if (currentTarget != null) return currentTarget;
 			}
 		}
 
@@ -84,9 +81,9 @@ public class EnemyAI extends Player {
 	 * @param steps the number of moves to the originating position
 	 */
 	private void checkAdjacentCoords(Point coord, int steps) {
-		checkCoord(new Point(coord.x + 1, coord.y), steps + 1);
-		checkCoord(new Point(coord.x - 1, coord.y), steps + 1);
+		checkCoord(new Point(coord.x - 1, coord.y), steps + 1); // ESWN
 		checkCoord(new Point(coord.x, coord.y + 1), steps + 1);
+		checkCoord(new Point(coord.x + 1, coord.y), steps + 1);
 		checkCoord(new Point(coord.x, coord.y - 1), steps + 1);
 	}
 
@@ -105,9 +102,9 @@ public class EnemyAI extends Player {
 			if (!(e instanceof Unit)) return;
 			if (this == ((Unit) e).getPlayer()) return;
 
-			nearestEnemy = e;
+			currentTarget = e;
 
-			String unitText = (totalSteps = steps) + " steps from " + e.getID();
+			String unitText = (stepsToTarget = steps) + " steps from " + e.getID();
 			String coordText = " [" + coord.x + "," + coord.y + "]";
 			Gdx.app.log("Target Acquired", unitText + coordText);
 
@@ -117,25 +114,26 @@ public class EnemyAI extends Player {
 		moves.put(coord, steps);
 	}
 
-	/** Attempts to move the selected unit closer to the target location */
+	/** Attempts to move the selected unit closer to the target entity */
 	private void moveTowards(Unit unit, Entity target) {
 		if (target == null) return;
 		Point nextCoord = new Point(target.getCoord());
 
 		while (unit.moveAvailable()) {
-			if (totalSteps == 0) break;
+			if (stepsToTarget == 0) break;
 
 			Point west = new Point(nextCoord.x + 1, nextCoord.y);
 			Point east = new Point(nextCoord.x - 1, nextCoord.y);
 			Point south = new Point(nextCoord.x, nextCoord.y + 1);
 			Point north = new Point(nextCoord.x, nextCoord.y - 1);
 
-			if (moves.get(west) != null && moves.get(west) <= totalSteps) nextCoord = west;
-			else if (moves.get(east) != null && moves.get(east) <= totalSteps) nextCoord = east;
-			else if (moves.get(south) != null && moves.get(south) <= totalSteps) nextCoord = south;
-			else if (moves.get(north) != null && moves.get(north) <= totalSteps) nextCoord = north;
+			// Checking for the next possible move from the target
+			if (moves.get(west) != null && moves.get(west) <= stepsToTarget) nextCoord = west;
+			else if (moves.get(east) != null && moves.get(east) <= stepsToTarget) nextCoord = east;
+			else if (moves.get(south) != null && moves.get(south) <= stepsToTarget) nextCoord = south;
+			else if (moves.get(north) != null && moves.get(north) <= stepsToTarget) nextCoord = north;
 
-			totalSteps -= 1;
+			stepsToTarget -= 1;
 			unit.move(nextCoord);
 		}
 	}
