@@ -2,6 +2,7 @@ package io.thebitspud.isotactica.players;
 
 import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
+import io.thebitspud.isotactica.world.entities.Direction;
 import io.thebitspud.isotactica.world.entities.Entity;
 import io.thebitspud.isotactica.world.entities.Unit;
 
@@ -47,7 +48,7 @@ public class EnemyAI extends Player {
 			unit.nextTurn();
 
 			// Basic movement and attacking AI
-			Entity target = findNearestTarget(unit, 16);
+			Entity target = findNearestTarget(unit, 25);
 			moveTowards(unit, target);
 			unit.attack(target);
 		}
@@ -81,10 +82,10 @@ public class EnemyAI extends Player {
 	 * @param steps the number of moves to the originating position
 	 */
 	private void checkAdjacentCoords(Point coord, int steps) {
-		checkCoord(new Point(coord.x - 1, coord.y), steps + 1); // ESWN
-		checkCoord(new Point(coord.x, coord.y + 1), steps + 1);
-		checkCoord(new Point(coord.x + 1, coord.y), steps + 1);
-		checkCoord(new Point(coord.x, coord.y - 1), steps + 1);
+		checkCoord(Direction.WEST.to(coord), steps + 1);
+		checkCoord(Direction.EAST.to(coord), steps + 1);
+		checkCoord(Direction.SOUTH.to(coord), steps + 1);
+		checkCoord(Direction.NORTH.to(coord), steps + 1);
 	}
 
 	/**

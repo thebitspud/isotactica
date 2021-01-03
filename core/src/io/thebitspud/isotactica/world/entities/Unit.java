@@ -76,7 +76,9 @@ public class Unit extends Entity {
 	@Override
 	public void tick(float delta) {
 		if (currentStep < tweenPath.size() - 1 && !moveTween.isActive()) {
-			moveTween.setTimeElapsed(0);
+			if (currentStep == 0) moveTween.setTimeElapsed(0);
+			else moveTween.setTimeElapsed(-0.1);
+
 			moveTween.setActive(true);
 
 			lastCoord = tweenPath.get(currentStep);
@@ -128,7 +130,6 @@ public class Unit extends Entity {
 		if (!canMoveToTile(coord)) return;
 
 		canMove = false;
-		lastCoord = this.coord;
 		this.coord = coord;
 
 		tweenPath.clear();
@@ -167,10 +168,10 @@ public class Unit extends Entity {
 	 * @param moves a curated hashmap of open locations
 	 */
 	public Point findNextStep(Point from, HashMap<Point, Integer> moves) {
-		Point west = new Point(from.x + 1, from.y);
-		Point east = new Point(from.x - 1, from.y);
-		Point south = new Point(from.x, from.y + 1);
-		Point north = new Point(from.x, from.y - 1);
+		Point west = Direction.WEST.to(from);
+		Point east = Direction.EAST.to(from);
+		Point south = Direction.SOUTH.to(from);
+		Point north = Direction.NORTH.to(from);
 
 		if (isNextStep(from, west, moves)) from = west;
 		else if (isNextStep(from, east, moves)) from = east;
@@ -211,10 +212,10 @@ public class Unit extends Entity {
 		moves.put(coord, movesLeft);
 		if (movesLeft <= 0) return;
 
-		findMoves(new Point(coord.x + 1, coord.y), movesLeft - 1);
-		findMoves(new Point(coord.x - 1, coord.y), movesLeft - 1);
-		findMoves(new Point(coord.x, coord.y + 1), movesLeft - 1);
-		findMoves(new Point(coord.x, coord.y - 1), movesLeft - 1);
+		findMoves(Direction.WEST.to(coord), movesLeft - 1);
+		findMoves(Direction.EAST.to(coord), movesLeft - 1);
+		findMoves(Direction.SOUTH.to(coord), movesLeft - 1);
+		findMoves(Direction.NORTH.to(coord), movesLeft - 1);
 	}
 
 	/* Action-Related Functions */

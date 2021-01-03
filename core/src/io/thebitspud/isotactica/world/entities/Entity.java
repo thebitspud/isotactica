@@ -45,21 +45,24 @@ public abstract class Entity extends Sprite {
 
 	public void tick(float delta) {
 		Point offset = world.getMapOverlay().getPointerPosition(coord);
-		moveTween.tick(delta);
 
 		if (moveTween.isActive()) {
+
 			// Calculating the render location of the entity during a tween
 			Point lastOffset = world.getMapOverlay().getPointerPosition(lastCoord);
 			float completion = (float) (moveTween.getTimeElapsed() / moveTween.getTimerDuration());
 			float tweenOffsetX = offset.x * completion + lastOffset.x * (1 - completion);
 			float tweenOffsetY = offset.y * completion + lastOffset.y * (1 - completion);
 
-			setPosition(tweenOffsetX, tweenOffsetY);
+			if (moveTween.getTimeElapsed() < 0) setPosition(lastOffset.x, lastOffset.y);
+			else setPosition(tweenOffsetX, tweenOffsetY);
 		} else {
 			// Calculating the render location of a non-moving entity
 			// This is done once per frame to account for camera movement
 			setPosition(offset.x, offset.y);
 		}
+
+		moveTween.tick(delta);
 
 		setScale(1 / world.getMapCamera().zoom);
 	}

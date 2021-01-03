@@ -1,7 +1,6 @@
 package io.thebitspud.isotactica.world.entities;
 
 import io.thebitspud.isotactica.Isotactica;
-import io.thebitspud.isotactica.players.Player;
 import io.thebitspud.isotactica.world.World;
 
 import java.awt.*;
