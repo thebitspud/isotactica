@@ -1,5 +1,6 @@
 package io.thebitspud.isotactica.world.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -22,9 +23,9 @@ public abstract class Entity extends Sprite {
 	protected JTimerUtil moveTween;
 	protected Point coord, lastCoord;
 	protected int currentHealth, maxHealth;
-	protected boolean active;
+	protected boolean active, pushable;
 
-	public Entity(Point coord, TextureRegion texture, Isotactica game) {
+	public Entity(Point coord, TextureRegion texture, Isotactica game, boolean pushable) {
 		super(texture);
 		this.game = game;
 		this.coord = coord;
@@ -33,21 +34,28 @@ public abstract class Entity extends Sprite {
 		world = game.getWorld();
 		entityManager = world.getEntityManager();
 		active = true;
+		this.pushable = pushable;
 		setOrigin(0, 0);
 
 		moveTween = new JTimerUtil(0.4f, false, false) {
 			@Override
 			public void onActivation() {
-
+				entityManager.requireSort();
+				checkTile();
 			}
 		};
+	}
+
+	private void checkTile() {
+		if (coord.x < 0 || coord.x > world.getWidth() - 1) active = false;
+		if (coord.y < 0 || coord.y > world.getHeight() - 1) active = false;
+		if (world.getTileID(coord).isEmpty()) active = false;
 	}
 
 	public void tick(float delta) {
 		Point offset = world.getMapOverlay().getPointerPosition(coord);
 
 		if (moveTween.isActive()) {
-
 			// Calculating the render location of the entity during a tween
 			Point lastOffset = world.getMapOverlay().getPointerPosition(lastCoord);
 			float completion = (float) (moveTween.getTimeElapsed() / moveTween.getTimerDuration());
@@ -65,6 +73,21 @@ public abstract class Entity extends Sprite {
 		moveTween.tick(delta);
 
 		setScale(1 / world.getMapCamera().zoom);
+	}
+
+	public void push(Direction dir) {
+		if (!pushable) return;
+		if (entityManager.getEntity(dir.to(coord)) != null) return;
+
+		lastCoord = coord;
+		coord = dir.to(coord);
+
+		moveTween.setTimeElapsed(0);
+		moveTween.setActive(true);
+
+		// Logging
+		String pushText = " pushed " + dir + " to [" + coord.x + ", " + coord.y + "]";
+		Gdx.app.log("Action", getIDText() + pushText);
 	}
 
 	public void render() {
@@ -86,8 +109,6 @@ public abstract class Entity extends Sprite {
 		drawer.filledRectangle(xPos, yPos, width * healthPercent / 200,  height);
 	}
 
-	/* Getters and Setters */
-
 	/** Increments or decrements the entity's health by the specified value */
 	public void adjustHealth(int value) {
 		currentHealth += value;
@@ -99,8 +120,12 @@ public abstract class Entity extends Sprite {
 		}
 	}
 
+	/* Abstract Methods */
+
 	public abstract String getInfo();
 	public abstract String getIDText();
+
+	/* Getters and Setters */
 
 	public boolean isActive() {
 		return active;

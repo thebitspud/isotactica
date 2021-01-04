@@ -76,8 +76,8 @@ public class AssetHandler extends AssetManager {
 		lastLevel = levelName;
 		game.getAssets().load(levelName + ".tmx", TiledMap.class);
 		game.getAssets().finishLoading();
-		Gdx.app.log("Map loaded", levelName + ".tmx");
 
+		Gdx.app.log("Map loaded", levelName + ".tmx");
 		return game.getAssets().get(levelName + ".tmx", TiledMap.class);
 	}
 

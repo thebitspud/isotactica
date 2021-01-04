@@ -95,7 +95,7 @@ public class EnemyAI extends Player {
 	 */
 	private void checkCoord(Point coord, int steps) {
 		if (moves.containsKey(coord)) return;
-		if (!tileAvailable(coord) && steps > 0) {
+		if (!world.tileAvailable(coord) && steps > 0) {
 			// Determining whether there is an enemy on the tile
 			Entity e = world.getEntityManager().getEntity(coord);
 			if (e == null) return;

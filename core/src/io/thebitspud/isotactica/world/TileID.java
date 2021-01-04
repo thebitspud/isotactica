@@ -33,7 +33,7 @@ public enum TileID {
 		return profile;
 	}
 
-	public boolean isSolid() {
+	public boolean isEmpty() {
 		return profile == MovementProfile.NONE;
 	}
 

@@ -1,5 +1,6 @@
 package io.thebitspud.isotactica.world.entities;
 
+import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.world.World;
 
@@ -59,11 +60,10 @@ public class EntityManager {
 	public void addEntity(Entity e) {
 		entities.add(e);
 		requireSort();
-	}
 
-	/** Removes the specified entity from the game */
-	public void removeEntity(Entity e) {
-		entities.remove(e);
+		// Logging
+		String coordText = " at [" + e.getCoord().x + ", " + e.getCoord().y + "]";
+		Gdx.app.log("Entity spawned", e.getIDText() + coordText);
 	}
 
 	/**

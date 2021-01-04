@@ -1,6 +1,5 @@
 package io.thebitspud.isotactica.world.entities;
 
-import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
 
 import java.awt.*;
@@ -16,29 +15,28 @@ public class MapObject extends Entity {
 	 * This will be replaced with a more dynamic system in the future
 	 */
 	public enum ID {
-		ROCK (10),
-		CRACKED_ROCK (10);
+		ROCK (10, false),
+		CRACKED_ROCK (10, false);
 
 		private final int maxHealth;
+		private final boolean pushable;
 
-		ID(int maxHealth) {
+		ID(int maxHealth, boolean pushable) {
 			this.maxHealth = maxHealth;
+			this.pushable = pushable;
 		}
 	}
 
 	private ID id;
 
 	public MapObject(Point coord, ID id, Isotactica game) {
-		super(coord, game.getAssets().mapObjects[id.ordinal()], game);
+		super(coord, game.getAssets().mapObjects[id.ordinal()], game, id.pushable);
 
 		this.id = id;
 
 		if (id == ID.CRACKED_ROCK) currentHealth = id.maxHealth / 2;
 		else currentHealth = id.maxHealth;
 		maxHealth = id.maxHealth;
-
-		String coordText = " at [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Entity spawned", getIDText() + coordText);
 	}
 
 	/* Getters and Setters */
@@ -56,7 +54,8 @@ public class MapObject extends Entity {
 	@Override
 	public String getInfo() {
 		String healthText = (id.maxHealth > 0) ? "\nHP: " + currentHealth + "/" + id.maxHealth : "";
-		return getIDText() + healthText;
+		String pushableText = "\nPushable: " + (pushable ? "TRUE" : "FALSE");
+		return getIDText() + healthText + "\nPushable: " + pushableText;
 	}
 
 	@Override

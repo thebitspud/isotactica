@@ -42,7 +42,7 @@ public abstract class Player {
 	 * @param id the Unit ID of the unit to be spawned
 	 */
 	public void spawnUnit(Point coord, Unit.ID id) {
-		if (!tileAvailable(coord)) return;
+		if (!world.tileAvailable(coord)) return;
 
 		Unit unit = new Unit(coord, id, this, game);
 		units.add(unit);
@@ -57,14 +57,6 @@ public abstract class Player {
 	 */
 	public void spawnUnit(int x, int y, Unit.ID id) {
 		spawnUnit(new Point(x, y), id);
-	}
-
-	/** Checks if a grid tile is open to being spawned on or moved to */
-	public boolean tileAvailable(Point coord) {
-		if (coord.x < 0 || coord.x > world.getWidth() - 1) return false;
-		if (coord.y < 0 || coord.y > world.getHeight() - 1) return false;
-		if (world.getTileID(coord).isSolid()) return false;
-		return world.getEntityManager().getEntity(coord) == null;
 	}
 
 	/** Iterates through the player's owned units to determine the actions available to them. */

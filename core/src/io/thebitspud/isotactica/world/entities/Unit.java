@@ -3,6 +3,7 @@ package io.thebitspud.isotactica.world.entities;
 import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.players.Player;
+import io.thebitspud.isotactica.players.User;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Unit extends Entity {
 	private ArrayList<Point> tweenPath;
 
 	public Unit(Point coord, ID id, Player player, Isotactica game) {
-		super(coord, game.getAssets().units[id.ordinal()], game);
+		super(coord, game.getAssets().units[id.ordinal()], game, true);
 
 		this.id = id;
 		this.player = player;
@@ -59,9 +60,6 @@ public class Unit extends Entity {
 		tweenPath = new ArrayList<>();
 
 		nextTurn();
-
-		String coordText = " at [" + coord.x + ", " + coord.y + "]";
-		Gdx.app.log("Entity spawned", getIDText() + coordText);
 	}
 
 	/** Resets the unit's movement and action tokens and begins its next turn */
@@ -75,6 +73,7 @@ public class Unit extends Entity {
 
 	@Override
 	public void tick(float delta) {
+		// Checking if the unit is ready for the next tween segment
 		if (currentStep < tweenPath.size() - 1 && !moveTween.isActive()) {
 			if (currentStep == 0) moveTween.setTimeElapsed(0);
 			else moveTween.setTimeElapsed(-0.1);
@@ -85,6 +84,8 @@ public class Unit extends Entity {
 			coord = tweenPath.get(currentStep + 1);
 
 			currentStep++;
+
+			if (currentStep == tweenPath.size() - 1) tweenPath.clear();
 		}
 
 		super.tick(delta);
@@ -118,7 +119,7 @@ public class Unit extends Entity {
 		}
 
 		for (Entity target: targets) {
-			Point drawPos = world.getMapOverlay().getPointerPosition(target.coord);
+			Point drawPos = world.getMapOverlay().getPointerPosition(target.getCoord());
 			game.getBatch().draw(game.getAssets().highlights[4], drawPos.x, drawPos.y, scale * 2, scale);
 		}
 	}
@@ -132,16 +133,15 @@ public class Unit extends Entity {
 		canMove = false;
 		this.coord = coord;
 
-		tweenPath.clear();
 		currentStep = 0;
 		findPath();
 
-		entityManager.requireSort();
-		player.assessActions();
-
+		// Logging
 		String lastCoordText = " moved from [" + lastCoord.x + ", " + lastCoord.y + "]";
 		String newCoordText = " to [" + coord.x + ", " + coord.y + "]";
 		Gdx.app.log("Action", getIDText() + lastCoordText + newCoordText);
+
+		player.assessActions();
 	}
 
 	/** Determines the path of the unit when moving */
@@ -156,6 +156,7 @@ public class Unit extends Entity {
 
 		tweenPath.add(coord);
 
+		// Logging
 		String pathText = tweenPath.toString().replaceAll("java.awt.Point", "");
 		pathText = pathText.replaceAll("x=", "");
 		pathText = pathText.replaceAll("y=", "");
@@ -206,7 +207,7 @@ public class Unit extends Entity {
 	 * @param movesLeft The number of remaining move cycles to be computed
 	 */
 	private void findMoves(Point coord, int movesLeft) {
-		if (!player.tileAvailable(coord) && movesLeft < id.agility) return;
+		if (!world.tileAvailable(coord) && movesLeft < id.agility) return;
 		if (moves.containsKey(coord) && moves.get(coord) >= movesLeft) return;
 
 		moves.put(coord, movesLeft);
@@ -224,14 +225,22 @@ public class Unit extends Entity {
 	public void attack(Entity e) {
 		if (!canAttackEntity(e)) return;
 
+		canMove = false;
+		canAct = false;
+
+		// Logging
 		String coordText = " [" + coord.x + ", " + coord.y + "]";
-		String targetCoordText = " [" + e.coord.x + ", " + e.coord.y + "]";
+		String targetCoordText = " [" + e.getCoord().x + ", " + e.getCoord().y + "]";
 		String attackText = getIDText() + coordText + " attacked " + e.getIDText() + targetCoordText;
 		Gdx.app.log("Action",  attackText);
 
-		canMove = false;
-		canAct = false;
 		e.adjustHealth(-id.attack);
+		// Experimental pushing behavior
+		if (player instanceof User) {
+			for (Direction dir : Direction.values()) {
+				if (e.getCoord().equals(dir.to(getCoord()))) e.push(dir);
+			}
+		}
 
 		player.assessActions();
 	}
@@ -251,8 +260,8 @@ public class Unit extends Entity {
 			if (!e.isActive()) continue;
 			if (e instanceof Unit && player == ((Unit) e).getPlayer()) continue;
 
-			int diffX = Math.abs(coord.x - e.coord.x);
-			int diffY = Math.abs(coord.y - e.coord.y);
+			int diffX = Math.abs(coord.x - e.getCoord().x);
+			int diffY = Math.abs(coord.y - e.getCoord().y);
 
 			if (diffX + diffY <= id.range) targets.add(e);
 		}
@@ -264,12 +273,19 @@ public class Unit extends Entity {
 	public String getInfo() {
 		String healthText = "\nHP: " + currentHealth + "/" + maxHealth;
 		String statsText = "\nAgility: " + id.agility;
-		return getIDText() + healthText + statsText;
+		String pushableText = "\nPushable: " + (pushable ? "TRUE" : "FALSE");
+		return getIDText() + healthText + statsText + pushableText;
 	}
 
 	@Override
 	public String getIDText() {
 		return "Unit." + id;
+	}
+
+	@Override
+	public Point getCoord() {
+		if (tweenPath.size() > 0) return tweenPath.get(tweenPath.size() - 1);
+		else return super.getCoord();
 	}
 
 	public ID getID() {

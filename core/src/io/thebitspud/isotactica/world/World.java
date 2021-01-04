@@ -171,6 +171,14 @@ public class World {
 		else return TileID.VOID;
 	}
 
+	/** Checks if a grid tile is open to being spawned on or moved to */
+	public boolean tileAvailable(Point coord) {
+		if (coord.x < 0 || coord.x > width - 1) return false;
+		if (coord.y < 0 || coord.y > height - 1) return false;
+		if (getTileID(coord).isEmpty()) return false;
+		return entityManager.getEntity(coord) == null;
+	}
+
 	/* Getters and Setters */
 
 	public WorldInputHandler getInput() {
