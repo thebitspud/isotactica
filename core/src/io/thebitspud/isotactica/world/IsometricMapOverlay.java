@@ -44,7 +44,7 @@ public class IsometricMapOverlay {
 			// displaying the info of the tile being hovered over
 			String coordText = "[" + coord.x + "," + coord.y + "]";
 			String tileText = world.getTileID(coord).getTileInfo();
-			String entityInfo = (hoveredEntity == null) ? "" : "\n\n" + hoveredEntity.getInfo();
+			String entityInfo = (hoveredEntity == null) ? "" : "\n\n" + hoveredEntity.getInfoText();
 			gameScreen.setTileInfoText(coordText + tileText + entityInfo);
 
 			// drawing the highlight texture

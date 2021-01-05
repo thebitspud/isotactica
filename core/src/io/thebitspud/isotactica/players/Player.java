@@ -33,6 +33,7 @@ public abstract class Player {
 			if (!unit.isActive()) units.remove(unit);
 		}
 
+		// Does not work in games with more than 1 user and 1 AI
 		if (units.isEmpty()) world.endGame(this instanceof EnemyAI);
 	}
 

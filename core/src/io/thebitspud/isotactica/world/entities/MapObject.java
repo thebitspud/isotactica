@@ -6,14 +6,10 @@ import java.awt.*;
 
 /**
  * Any non-controllable environmental object
- * This class is outdated and will be updated in the near future
  */
 
 public class MapObject extends Entity {
-	/**
-	 * An enum of all map objects and their stats
-	 * This will be replaced with a more dynamic system in the future
-	 */
+	/** An enum of all map objects and their stats */
 	public enum ID {
 		ROCK (10, false),
 		CRACKED_ROCK (10, false);
@@ -52,14 +48,19 @@ public class MapObject extends Entity {
 	}
 
 	@Override
-	public String getInfo() {
-		String healthText = (id.maxHealth > 0) ? "\nHP: " + currentHealth + "/" + id.maxHealth : "";
-		String pushableText = "\nPushable: " + (pushable ? "TRUE" : "FALSE");
-		return getIDText() + healthText + "\nPushable: " + pushableText;
+	public ID getID() {
+		return id;
 	}
 
 	@Override
 	public String getIDText() {
 		return "MapObject." + id;
+	}
+
+	@Override
+	public String getInfoText() {
+		String healthText = (id.maxHealth > 0) ? "\nHP: " + currentHealth + "/" + id.maxHealth : "";
+		String pushableText = "\nPushable: " + (pushable ? "TRUE" : "FALSE");
+		return getIDText() + healthText + "\nPushable: " + pushableText;
 	}
 }

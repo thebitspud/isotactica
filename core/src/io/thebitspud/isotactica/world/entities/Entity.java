@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.thebitspud.isotactica.Isotactica;
+import io.thebitspud.isotactica.utils.Identifiable;
 import io.thebitspud.isotactica.utils.JTimerUtil;
+import io.thebitspud.isotactica.world.Direction;
 import io.thebitspud.isotactica.world.World;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -15,7 +17,7 @@ import java.awt.Point;
  * The catch-all template for non-tile game objects
  */
 
-public abstract class Entity extends Sprite {
+public abstract class Entity extends Sprite implements Identifiable {
 	protected Isotactica game;
 	protected World world;
 	protected EntityManager entityManager;
@@ -113,17 +115,17 @@ public abstract class Entity extends Sprite {
 	public void adjustHealth(int value) {
 		currentHealth += value;
 
+		// Logging
+		String healText = "Healed " + value + " to " + getIDText();
+		String damageText = "Dealt " + -value + " to " + getIDText();
+		Gdx.app.log("Health", value > 0 ? healText : damageText);
+
 		if (currentHealth > maxHealth) currentHealth = maxHealth;
 		else if (currentHealth <= 0) {
 			currentHealth = 0;
 			active = false;
 		}
 	}
-
-	/* Abstract Methods */
-
-	public abstract String getInfo();
-	public abstract String getIDText();
 
 	/* Getters and Setters */
 

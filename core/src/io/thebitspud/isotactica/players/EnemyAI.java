@@ -2,7 +2,7 @@ package io.thebitspud.isotactica.players;
 
 import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
-import io.thebitspud.isotactica.world.entities.Direction;
+import io.thebitspud.isotactica.world.Direction;
 import io.thebitspud.isotactica.world.entities.Entity;
 import io.thebitspud.isotactica.world.entities.Unit;
 
@@ -56,7 +56,11 @@ public class EnemyAI extends Player {
 		world.nextPlayer();
 	}
 
-	/** Finds the enemy target closest to a given unit */
+	/**
+	 * Finds the enemy target closest to a given unit
+	 * Uses a breadth-first search algorithm
+	 * @param searchRange the maximum allowed path size (in tiles)
+	 */
 	public Entity findNearestTarget(Unit unit, int searchRange) {
 		moves.clear();
 		currentTarget = null;

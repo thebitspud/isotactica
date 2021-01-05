@@ -1,4 +1,4 @@
-package io.thebitspud.isotactica.world.entities;
+package io.thebitspud.isotactica.world;
 
 import java.awt.*;
 

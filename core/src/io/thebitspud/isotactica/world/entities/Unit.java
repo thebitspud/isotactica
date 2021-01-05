@@ -3,27 +3,25 @@ package io.thebitspud.isotactica.world.entities;
 import com.badlogic.gdx.Gdx;
 import io.thebitspud.isotactica.Isotactica;
 import io.thebitspud.isotactica.players.Player;
-import io.thebitspud.isotactica.players.User;
+import io.thebitspud.isotactica.world.Direction;
+import io.thebitspud.isotactica.world.abilities.Ability;
+import io.thebitspud.isotactica.world.abilities.InstantAbility;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Any controllable unit that can move and act as directed by a player
+ * A controllable unit that can move and act as directed by a player
  */
 
 public class Unit extends Entity {
-	/**
-	 * An enum of all game units and their stats
-	 * This will be replaced with a more dynamic system in the future
-	 */
+	/** An enum of all game units and their stats */
 	public enum ID {
 		WARRIOR (10, 2, 1, 2),
 		GOBLIN_BRUTE (15, 2, 1, 1);
 
 		public final int maxHealth, agility, range, attack;
-
 		ID(int maxHealth, int agility, int range, int attack) {
 			this.maxHealth = maxHealth;
 			this.agility = agility;
@@ -36,7 +34,6 @@ public class Unit extends Entity {
 	private Player player;
 
 	private boolean canMove, canAct;
-	private int currentStep;
 	/**
 	 * A HashMap of open locations this unit can move to
 	 * The integer value indicates the max number of remaining moves from a location
@@ -44,8 +41,11 @@ public class Unit extends Entity {
 	private HashMap<Point, Integer> moves;
 	/** A list of entities this unit can attack */
 	private ArrayList<Entity> targets;
-	/** The list of coords travelled along when this unit move */
+	/** The list of coords travelled along when this unit moves */
 	private ArrayList<Point> tweenPath;
+	private int currentStep;
+
+	private ArrayList<Ability> abilities;
 
 	public Unit(Point coord, ID id, Player player, Isotactica game) {
 		super(coord, game.getAssets().units[id.ordinal()], game, true);
@@ -58,6 +58,18 @@ public class Unit extends Entity {
 		moves = new HashMap<>();
 		targets = new ArrayList<>();
 		tweenPath = new ArrayList<>();
+		abilities = new ArrayList<>();
+
+		// Temporary ability assignment system
+		switch (id) {
+			case WARRIOR:
+				addAbility(InstantAbility.ID.BLADE_SPIN);
+				break;
+			case GOBLIN_BRUTE:
+				addAbility(InstantAbility.ID.DOUBLE_STRIKE);
+				break;
+			default: break;
+		}
 
 		nextTurn();
 	}
@@ -69,6 +81,8 @@ public class Unit extends Entity {
 
 		findMoves();
 		findTargets();
+
+		for (Ability a : abilities) a.update();
 	}
 
 	@Override
@@ -124,7 +138,7 @@ public class Unit extends Entity {
 		}
 	}
 
-	/* Movement-Related Functions */
+	/* Movement */
 
 	/** Attempts to move this unit to the specified grid location */
 	public void move(Point coord) {
@@ -143,6 +157,39 @@ public class Unit extends Entity {
 
 		player.assessActions();
 	}
+
+	/** Checks whether this unit can be moved to the specified grid location */
+	public boolean canMoveToTile(Point coord) {
+		if (!canMove) return false;
+		return moves.containsKey(coord);
+	}
+
+	/** Compiles a list of grid locations this unit can currently move to */
+	public void findMoves() {
+		moves.clear();
+		if (!canMove) return;
+		findMoves(coord, id.agility);
+	}
+
+	/**
+	 * Uses a modified flood fill algorithm to determine which grid locations the unit can move to.
+	 * @param coord The starting coordinate for the fill
+	 * @param movesLeft The number of remaining move cycles to be computed
+	 */
+	private void findMoves(Point coord, int movesLeft) {
+		if (!world.tileAvailable(coord) && movesLeft < id.agility) return;
+		if (moves.containsKey(coord) && moves.get(coord) >= movesLeft) return;
+
+		moves.put(coord, movesLeft);
+		if (movesLeft <= 0) return;
+
+		findMoves(Direction.WEST.to(coord), movesLeft - 1);
+		findMoves(Direction.EAST.to(coord), movesLeft - 1);
+		findMoves(Direction.SOUTH.to(coord), movesLeft - 1);
+		findMoves(Direction.NORTH.to(coord), movesLeft - 1);
+	}
+
+	/* Pathfinding */
 
 	/** Determines the path of the unit when moving */
 	private void findPath() {
@@ -188,38 +235,7 @@ public class Unit extends Entity {
 		return moves.get(to) > moves.get(from);
 	}
 
-	/** Checks whether this unit can be moved to the specified grid location */
-	public boolean canMoveToTile(Point coord) {
-		if (!canMove) return false;
-		return moves.containsKey(coord);
-	}
-
-	/** Compiles a list of grid locations this unit can currently move to */
-	public void findMoves() {
-		moves.clear();
-		if (!canMove) return;
-		findMoves(coord, id.agility);
-	}
-
-	/**
-	 * Uses a modified flood fill algorithm to determine which grid locations the unit can move to.
-	 * @param coord The starting coordinate for the fill
-	 * @param movesLeft The number of remaining move cycles to be computed
-	 */
-	private void findMoves(Point coord, int movesLeft) {
-		if (!world.tileAvailable(coord) && movesLeft < id.agility) return;
-		if (moves.containsKey(coord) && moves.get(coord) >= movesLeft) return;
-
-		moves.put(coord, movesLeft);
-		if (movesLeft <= 0) return;
-
-		findMoves(Direction.WEST.to(coord), movesLeft - 1);
-		findMoves(Direction.EAST.to(coord), movesLeft - 1);
-		findMoves(Direction.SOUTH.to(coord), movesLeft - 1);
-		findMoves(Direction.NORTH.to(coord), movesLeft - 1);
-	}
-
-	/* Action-Related Functions */
+	/* Actions */
 
 	/** This unit attempts to attack a specified entity */
 	public void attack(Entity e) {
@@ -234,13 +250,8 @@ public class Unit extends Entity {
 		String attackText = getIDText() + coordText + " attacked " + e.getIDText() + targetCoordText;
 		Gdx.app.log("Action",  attackText);
 
-		e.adjustHealth(-id.attack);
-		// Experimental pushing behavior
-		if (player instanceof User) {
-			for (Direction dir : Direction.values()) {
-				if (e.getCoord().equals(dir.to(getCoord()))) e.push(dir);
-			}
-		}
+		// e.adjustHealth(-id.attack); TEMP
+		abilities.get(0).cast(e.getCoord());
 
 		player.assessActions();
 	}
@@ -267,14 +278,15 @@ public class Unit extends Entity {
 		}
 	}
 
+	private void addAbility(InstantAbility.ID abilityID) {
+		abilities.add(new InstantAbility(game, this, abilityID));
+	}
+
 	/* Getters and Setters */
 
 	@Override
-	public String getInfo() {
-		String healthText = "\nHP: " + currentHealth + "/" + maxHealth;
-		String statsText = "\nAgility: " + id.agility;
-		String pushableText = "\nPushable: " + (pushable ? "TRUE" : "FALSE");
-		return getIDText() + healthText + statsText + pushableText;
+	public ID getID() {
+		return id;
 	}
 
 	@Override
@@ -283,13 +295,17 @@ public class Unit extends Entity {
 	}
 
 	@Override
+	public String getInfoText() {
+		String healthText = "\nHP: " + currentHealth + "/" + maxHealth;
+		String statsText = "\nAgility: " + id.agility;
+		String pushableText = "\nPushable: " + (pushable ? "TRUE" : "FALSE");
+		return getIDText() + healthText + statsText + pushableText;
+	}
+
+	@Override
 	public Point getCoord() {
 		if (tweenPath.size() > 0) return tweenPath.get(tweenPath.size() - 1);
 		else return super.getCoord();
-	}
-
-	public ID getID() {
-		return id;
 	}
 
 	public Player getPlayer() {
